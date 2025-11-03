@@ -42,7 +42,7 @@
         }
         
         #gameOverMensaje {
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         
         #playerNameInput {
@@ -113,6 +113,7 @@
             gap: 10px;
             margin-top: 20px;
         }
+        /* ... (estilos de botones de control) ... */
         #controles button { font-size: 2em; border: none; background-color: #333; color: #f8c8dc; border-radius: 10px; cursor: pointer; user-select: none; }
         #controles button:active { background-color: #555; }
         #btnArriba { grid-column: 2 / 3; grid-row: 1 / 2; }
@@ -155,10 +156,9 @@
         // --- CONFIGURACIÓN Y REFERENCIAS ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const box = 20; // Tamaño de la cuadrícula
+        const box = 20; 
         const canvasSize = canvas.width / box;
 
-        // Referencias a elementos
         const audioMusic = document.getElementById('backgroundMusic');
         const audioEat = document.getElementById('eatSound');
         const audioLose = document.getElementById('loseSound');
@@ -176,17 +176,23 @@
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const finalHighScoreDisplay = document.getElementById('finalHighScoreDisplay');
 
-        // --- ¡NUEVAS VARIABLES DE JUEGO (PAC-MAN) ---
+        // --- VARIABLES DE JUEGO (PAC-MAN) ---
         let player;
         let ghosts;
         let pellets;
+        let powerPellets; // ¡NUEVO!
         let score = 0;
-        let d; // Dirección
-        let gameSpeed = 130; // Velocidad del juego
+        let d; 
+        let gameSpeed = 150; // ¡MODIFICADO! Más lento (antes 130)
         let game; 
         let playerName = "Preciosa"; 
+
+        // ¡NUEVO! Variables de Power-Up
+        let isPoweredUp = false;
+        let powerUpTimer = 0;
+        const POWER_UP_DURATION = 100; // 100 ticks (100 * 150ms = 15 segundos)
         
-        // --- LÓGICA DE PUNTAJE MÁS ALTO (Sin cambios) ---
+        // --- LÓGICA DE PUNTAJE MÁS ALTO ---
         function cargarHighScore() {
             const hsValue = localStorage.getItem('juegoNovia_hsValue') || 0;
             const hsName = localStorage.getItem('juegoNovia_hsName') || 'Nadie';
@@ -214,32 +220,41 @@
             audioMusic.play().catch(e => console.log("Música detenida por el navegador"));
         }
 
-        // --- ¡NUEVO! iniciarJuego (Lógica Pac-Man) ---
+        // --- ¡MODIFICADO! iniciarJuego (Lógica Pac-Man) ---
         function iniciarJuego() {
             score = 0;
             d = undefined; 
-            player = { x: 9 * box, y: 10 * box }; // Posición inicial del jugador
+            isPoweredUp = false;
+            powerUpTimer = 0;
+            player = { x: 9 * box, y: 10 * box }; 
 
-            // Posición inicial de los fantasmas
+            // ¡MODIFICADO! Fantasmas ahora guardan su spawn
             ghosts = [
-                { x: 1 * box, y: 1 * box, color: "#ffb8b8" }, // Fantasma rojo/rosa
-                { x: (canvasSize - 2) * box, y: 1 * box, color: "#b8fff8" }, // Fantasma cyan
-                { x: 1 * box, y: (canvasSize - 2) * box, color: "#f8d8b8" }, // Fantasma naranja
-                { x: (canvasSize - 2) * box, y: (canvasSize - 2) * box, color: "#ffc8f8" } // Fantasma rosa
+                { x: 1 * box, y: 1 * box, color: "#ffb8b8", spawnX: 1 * box, spawnY: 1 * box },
+                { x: (canvasSize - 2) * box, y: 1 * box, color: "#b8fff8", spawnX: (canvasSize - 2) * box, spawnY: 1 * box },
+                { x: 1 * box, y: (canvasSize - 2) * box, color: "#f8d8b8", spawnX: 1 * box, spawnY: (canvasSize - 2) * box },
+                { x: (canvasSize - 2) * box, y: (canvasSize - 2) * box, color: "#ffc8f8", spawnX: (canvasSize - 2) * box, spawnY: (canvasSize - 2) * box }
             ];
             
-            // Llenar la pantalla de "pellets" (puntos)
             pellets = [];
+            powerPellets = []; // ¡NUEVO!
             for (let x = 0; x < canvasSize; x++) {
                 for (let y = 0; y < canvasSize; y++) {
-                    // No poner un pellet donde empieza el jugador
-                    if (x === 9 && y === 10) continue; 
+                    if (x === 9 && y === 10) continue; // Skip player start
                     
                     let onGhost = false;
                     for(let g of ghosts) {
                         if (g.x === x * box && g.y === y * box) onGhost = true;
                     }
-                    if (!onGhost) {
+                    if(onGhost) continue; 
+
+                    // ¡NUEVO! Pone Uvas (Power Pellets) en las esquinas
+                    if ((x === 0 && y === 0) || 
+                        (x === canvasSize - 1 && y === 0) || 
+                        (x === 0 && y === canvasSize - 1) || 
+                        (x === canvasSize - 1 && y === canvasSize - 1)) {
+                        powerPellets.push({ x: x * box, y: y * box });
+                    } else {
                         pellets.push({ x: x * box, y: y * box });
                     }
                 }
@@ -272,20 +287,20 @@
             gameOverScreen.style.display = 'flex';
         }
 
-        // --- CONTROLES (Sin cambios) ---
+        // --- CONTROLES ---
         document.getElementById('btnArriba').addEventListener('click', () => { if(d != "DOWN") d = "UP"; });
         document.getElementById('btnAbajo').addEventListener('click', () => { if(d != "UP") d = "DOWN"; });
         document.getElementById('btnIzquierda').addEventListener('click', () => { if(d != "RIGHT") d = "LEFT"; });
         document.getElementById('btnDerecha').addEventListener('click', () => { if(d != "LEFT") d = "RIGHT"; });
 
-        // --- ¡NUEVO! LOOP PRINCIPAL (DRAW) - Lógica Pac-Man ---
+        // --- ¡MODIFICADO! LOOP PRINCIPAL (DRAW) ---
         function draw() {
             // 1. Dibuja el fondo
             ctx.fillStyle = "#222";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // 2. Dibuja los Pellets (puntos)
-            ctx.fillStyle = "#f8c8dc"; // Puntos rosa pálido
+            ctx.fillStyle = "#f8c8dc"; 
             ctx.font = `bold ${box}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -293,30 +308,46 @@
                 ctx.fillText('·', p.x + box / 2, p.y + box / 2);
             }
 
-            // 3. Dibuja al Jugador (un corazón)
+            // 3. ¡NUEVO! Dibuja las Uvas (Power Pellets)
+            ctx.fillStyle = "#f8c8dc"; // Mismo color, emoji diferente
+            ctx.font = `${box}px Arial`;
+            for (let p of powerPellets) {
+                ctx.fillText('🍇', p.x + box / 2, p.y + box / 2 + 2);
+            }
+
+            // 4. Dibuja al Jugador (corazón)
             ctx.fillStyle = "#f8c8dc";
             ctx.font = `${box}px Arial`;
-            ctx.fillText('❤️', player.x + box / 2, player.y + box / 2 + 2); // Usamos el corazón
+            ctx.fillText('❤️', player.x + box / 2, player.y + box / 2 + 2); 
 
-            // 4. Dibuja los Fantasmas
+            // 5. ¡MODIFICADO! Dibuja los Fantasmas
             for (let g of ghosts) {
-                ctx.fillStyle = g.color;
-                ctx.font = `${box}px Arial`;
-                // Puedes usar 👻 o cuadrados de colores. Los emojis son más lindos.
+                if (isPoweredUp) {
+                    ctx.fillStyle = "#aaa"; // ¡NUEVO! Color vulnerable
+                } else {
+                    ctx.fillStyle = g.color; // Color normal
+                }
                 ctx.fillText('👻', g.x + box / 2, g.y + box / 2 + 2);
             }
 
-            // 5. Dibuja el Puntaje
+            // 6. Dibuja el Puntaje
             ctx.fillStyle = "#fff";
             ctx.font = "20px Arial";
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillText(`${playerName}: ${score} pts`, 10, 10);
             
-            // Si no hay dirección, no te muevas
+            // 7. ¡NUEVO! Manejar el Power-Up Timer
+            if (isPoweredUp) {
+                powerUpTimer--;
+                if (powerUpTimer <= 0) {
+                    isPoweredUp = false;
+                }
+            }
+
             if (!d) return; 
 
-            // 6. Mueve al Jugador
+            // 8. Mueve al Jugador
             let playerX = player.x;
             let playerY = player.y;
             if (d == "LEFT") playerX -= box;
@@ -324,7 +355,7 @@
             if (d == "RIGHT") playerX += box;
             if (d == "DOWN") playerY += box;
 
-            // 7. ¡NUEVO! Lógica de "Wrap" (atravesar paredes)
+            // Lógica de "Wrap" (atravesar paredes)
             if (playerX < 0) playerX = (canvasSize - 1) * box;
             if (playerX >= canvasSize * box) playerX = 0;
             if (playerY < 0) playerY = (canvasSize - 1) * box;
@@ -333,48 +364,82 @@
             player.x = playerX;
             player.y = playerY;
 
-            // 8. Mueve los Fantasmas (IA simple de persecución)
+            // 9. ¡MODIFICADO! Mueve los Fantasmas (IA de persecución o huida)
             for (let g of ghosts) {
-                // El fantasma decide si moverse en X o en Y
-                if (Math.random() < 0.5) { // 50% de probabilidad de moverse en X
-                    if (g.x < player.x) g.x += box;
-                    else if (g.x > player.x) g.x -= box;
-                } else { // 50% de probabilidad de moverse en Y
-                    if (g.y < player.y) g.y += box;
-                    else if (g.y > player.y) g.y -= box;
+                if (isPoweredUp) {
+                    // ¡NUEVO! IA de Huida
+                    if (Math.random() < 0.5) { 
+                        if (g.x < player.x) g.x -= box; // Moverse *lejos* de X
+                        else if (g.x > player.x) g.x += box;
+                    } else { 
+                        if (g.y < player.y) g.y -= box; // Moverse *lejos* de Y
+                        else if (g.y > player.y) g.y += box;
+                    }
+                } else {
+                    // IA de Persecución (original)
+                    if (Math.random() < 0.5) { 
+                        if (g.x < player.x) g.x += box;
+                        else if (g.x > player.x) g.x -= box;
+                    } else { 
+                        if (g.y < player.y) g.y += box;
+                        else if (g.y > player.y) g.y -= box;
+                    }
                 }
-
-                // Wrap para los fantasmas también
+                
+                // Wrap para fantasmas
                 if (g.x < 0) g.x = (canvasSize - 1) * box;
                 if (g.x >= canvasSize * box) g.x = 0;
                 if (g.y < 0) g.y = (canvasSize - 1) * box;
                 if (g.y >= canvasSize * box) g.y = 0;
             }
 
-            // 9. Revisar Colisiones
-            // a) ¿Jugador choca con fantasma? = GAME OVER
-            for (let g of ghosts) {
+            // 10. ¡MODIFICADO! Revisar Colisiones
+            // a) ¿Jugador choca con fantasma?
+            for (let i = 0; i < ghosts.length; i++) {
+                let g = ghosts[i];
                 if (player.x === g.x && player.y === g.y) {
-                    mostrarGameOver();
-                    return;
+                    if (isPoweredUp) {
+                        // ¡NUEVO! Come al fantasma
+                        score += 200; // Puntos extra
+                        g.x = g.spawnX; // Lo envía a su "casa"
+                        g.y = g.spawnY;
+                        audioEat.currentTime = 0; 
+                        audioEat.play();
+                    } else {
+                        // GAME OVER
+                        mostrarGameOver();
+                        return;
+                    }
                 }
             }
             
             // b) ¿Jugador come un pellet?
-            for (let i = 0; i < pellets.length; i++) {
+            for (let i = pellets.length - 1; i >= 0; i--) { // Iterar al revés para borrar
                 if (player.x === pellets[i].x && player.y === pellets[i].y) {
-                    score += 10; // 10 puntos por pellet
+                    score += 10; 
                     audioEat.currentTime = 0; 
                     audioEat.play();
-                    pellets.splice(i, 1); // Quita el pellet comido
+                    pellets.splice(i, 1); 
                     break; 
                 }
             }
 
-            // 10. ¡NUEVO! Revisar Condición de Victoria
-            if (pellets.length === 0) {
-                score += 1000; // ¡Bonus de 1000 puntos por limpiar la pantalla!
-                mostrarGameOver(); // Muestra la pantalla final (contará como récord)
+            // c) ¡NUEVO! ¿Jugador come una uva (power pellet)?
+            for (let i = powerPellets.length - 1; i >= 0; i--) {
+                if (player.x === powerPellets[i].x && player.y === powerPellets[i].y) {
+                    isPoweredUp = true;
+                    powerUpTimer = POWER_UP_DURATION;
+                    audioEat.currentTime = 0; // Reusar el sonido de comer
+                    audioEat.play();
+                    powerPellets.splice(i, 1); // Quita la uva
+                    break; 
+                }
+            }
+
+            // 11. Revisar Condición de Victoria
+            if (pellets.length === 0 && powerPellets.length === 0) {
+                score += 1000; 
+                mostrarGameOver(); 
                 return;
             }
         }
