@@ -18,19 +18,66 @@
             overflow: hidden;
             touch-action: manipulation;
         }
+
+        /* --- PANTALLAS DE MENSAJES (Bienvenida y Game Over) --- */
+        .pantalla-overlay {
+            display: flex; /* Por defecto la de bienvenida se ve */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #f8c8dc;
+            font-size: 2.5em; 
+            font-weight: bold;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box; 
+            line-height: 1.4;
+            z-index: 100; /* Asegura que esté por encima de todo */
+        }
+        
+        #gameOverMensaje {
+            display: none; /* Oculto por defecto */
+        }
+
+        /* --- BOTONES DE MENÚ --- */
+        .btnMenu {
+            font-size: 0.5em; /* Tamaño relativo al mensaje */
+            padding: 15px 30px;
+            margin-top: 30px; 
+            background-color: #f8c8dc; /* Rosa */
+            color: #111; /* Texto oscuro */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btnMenu:active {
+            background-color: #fff; /* Efecto al presionar */
+        }
+
+        /* --- ELEMENTOS DEL JUEGO (Ocultos al inicio) --- */
         h1 {
             font-size: 1.5em;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: #f8c8dc;
+            display: none; /* Oculto al inicio */
         }
         canvas {
             background-color: #222;
             border: 2px solid #f8c8dc;
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(248, 200, 220, 0.5);
+            display: none; /* Oculto al inicio */
+            position: relative; /* Para que la puntuación se vea bien */
         }
         #controles {
-            display: grid;
+            display: none; /* Oculto al inicio */
             grid-template-columns: repeat(3, 70px);
             grid-template-rows: repeat(2, 70px);
             gap: 10px;
@@ -52,50 +99,23 @@
         #btnIzquierda { grid-column: 1 / 2; grid-row: 2 / 3; }
         #btnAbajo { grid-column: 2 / 3; grid-row: 2 / 3; }
         #btnDerecha { grid-column: 3 / 4; grid-row: 2 / 3; }
-
-        /* --- EL MENSAJE ESPECIAL (MODIFICADO) --- */
-        #gameOverMensaje {
-            display: none; 
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85); /* Más oscuro */
-            color: #f8c8dc;
-            font-size: 2.5em; 
-            font-weight: bold;
-            text-align: center;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box; 
-            line-height: 1.4;
-        }
-
-        /* --- ¡NUEVO! ESTILO DEL BOTÓN DE REINICIO --- */
-        #btnReiniciar {
-            font-size: 0.5em; /* Tamaño relativo al mensaje */
-            padding: 15px 30px;
-            margin-top: 30px; /* Espacio entre el mensaje y el botón */
-            background-color: #f8c8dc; /* Rosa */
-            color: #111; /* Texto oscuro */
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        #btnReiniciar:active {
-            background-color: #fff; /* Efecto al presionar */
-        }
     </style>
 </head>
 <body>
 
+    <div id="welcomeMensaje" class="pantalla-overlay">
+        <span>¡Hola Preciosa! ❤️</span>
+        <span style="font-size: 0.6em; margin-top: 10px;">Te hice este jueguito</span>
+        <button id="btnJugar" class="btnMenu">¡Jugar!</button>
+    </div>
+
+    <div id="gameOverMensaje" class="pantalla-overlay">
+        <span>eres lo mejor de mi vida preciosa &lt;3</span>
+        <button id="btnReiniciar" class="btnMenu">Volver a Jugar</button>
+    </div>
+
     <h1>Un juego solo para ti</h1>
     <canvas id="gameCanvas" width="300" height="300"></canvas>
-    
     <div id="controles">
         <button id="btnArriba">↑</button>
         <button id="btnIzquierda">←</button>
@@ -103,119 +123,102 @@
         <button id="btnDerecha">→</button>
     </div>
 
-    <div id="gameOverMensaje">
-        <span>eres lo mejor de mi vida preciosa &lt;3</span>
-        <button id="btnReiniciar">Volver a Jugar</button>
-    </div>
-
     <audio id="backgroundMusic" src="musica.mp3" loop></audio>
-
-
-    <script>
-        // Configuración del juego
+    <audio id="eatSound" src="comer.mp3"></audio> <audio id="loseSound" src="perder.mp3"></audio> <script>
+        // --- CONFIGURACIÓN Y REFERENCIAS ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const box = 20;
         const canvasSize = canvas.width / box;
 
-        // --- ¡NUEVO! Referencia al audio y al botón ---
-        const audio = document.getElementById('backgroundMusic');
+        // Referencias a elementos
+        const audioMusic = document.getElementById('backgroundMusic');
+        const audioEat = document.getElementById('eatSound');
+        const audioLose = document.getElementById('loseSound');
+        
+        const welcomeScreen = document.getElementById('welcomeMensaje');
+        const gameOverScreen = document.getElementById('gameOverMensaje');
+        const btnJugar = document.getElementById('btnJugar');
         const btnReiniciar = document.getElementById('btnReiniciar');
-        let musicStarted = false; // Control para iniciar música
-        // ---------------------------------------------
 
+        const gameTitle = document.querySelector('h1');
+        const gameControls = document.getElementById('controles');
+
+        // Variables del juego
         let snake = [];
-        snake[0] = { x: 9 * box, y: 10 * box }; 
-
-        let food = {
-            x: Math.floor(Math.random() * canvasSize) * box,
-            y: Math.floor(Math.random() * canvasSize) * box
-        };
-
+        let food = {};
         let score = 0;
-        let d; 
+        let d;
+        let gameSpeed = 150; // ¡NUEVO! Velocidad inicial
+        let game; // Variable para el loop
 
-        // --- ¡NUEVO! Función para iniciar la música con la 1ra interacción ---
+        // --- FUNCIONES DE INICIO Y FIN ---
+
+        // Al hacer clic en "Jugar"
+        btnJugar.addEventListener('click', () => {
+            welcomeScreen.style.display = 'none'; // Oculta bienvenida
+            
+            // Muestra los elementos del juego
+            gameTitle.style.display = 'block';
+            canvas.style.display = 'block';
+            gameControls.style.display = 'grid';
+
+            iniciarMusica(); // Inicia la música
+            iniciarJuego(); // Comienza el juego
+        });
+
+        // Al hacer clic en "Volver a Jugar"
+        btnReiniciar.addEventListener('click', () => {
+            location.reload(); // Recarga la página (la forma más fácil)
+        });
+
         function iniciarMusica() {
-            if (!musicStarted) {
-                audio.play().catch(e => console.log("La música no pudo iniciarse:", e));
-                musicStarted = true;
-            }
+            audioMusic.play().catch(e => console.log("Música detenida por el navegador"));
         }
 
-        // --- ¡MODIFICADO! Controles táctiles ahora inician la música ---
-        document.getElementById('btnArriba').addEventListener('click', () => { 
-            if(d != "DOWN") d = "UP";
-            iniciarMusica();
-        });
-        document.getElementById('btnAbajo').addEventListener('click', () => { 
-            if(d != "UP") d = "DOWN";
-            iniciarMusica();
-        });
-        document.getElementById('btnIzquierda').addEventListener('click', () => { 
-            if(d != "RIGHT") d = "LEFT";
-            iniciarMusica();
-        });
-        document.getElementById('btnDerecha').addEventListener('click', () => { 
-            if(d != "LEFT") d = "RIGHT";
-            iniciarMusica();
-        });
-
-        // --- ¡NUEVO! Event listener para el botón de reinicio ---
-        // Simplemente recarga la página, es la forma más fácil.
-        btnReiniciar.addEventListener('click', () => {
-            location.reload();
-        });
-
+        function iniciarJuego() {
+            snake = [{ x: 9 * box, y: 10 * box }];
+            score = 0;
+            gameSpeed = 150;
+            d = undefined; // Sin dirección inicial
+            colocarComida();
+            
+            if(game) clearInterval(game); // Limpia cualquier loop anterior
+            game = setInterval(draw, gameSpeed); // Inicia el loop
+        }
+        
         function mostrarGameOver() {
             clearInterval(game);
-            const mensajeDiv = document.getElementById('gameOverMensaje');
-            mensajeDiv.style.display = 'flex';
+            audioMusic.pause(); // Para la música de fondo
+            audioLose.play(); // Suena "perder"
+            
+            // Oculta el juego y muestra la pantalla final
+            gameTitle.style.display = 'none';
+            canvas.style.display = 'none';
+            gameControls.style.display = 'none';
+            gameOverScreen.style.display = 'flex';
         }
 
-        function draw() {
-            ctx.fillStyle = "#222";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // --- CONTROLES ---
+        document.getElementById('btnArriba').addEventListener('click', () => { if(d != "DOWN") d = "UP"; });
+        document.getElementById('btnAbajo').addEventListener('click', () => { if(d != "UP") d = "DOWN"; });
+        document.getElementById('btnIzquierda').addEventListener('click', () => { if(d != "RIGHT") d = "LEFT"; });
+        document.getElementById('btnDerecha').addEventListener('click', () => { if(d != "LEFT") d = "RIGHT"; });
 
+        // --- LÓGICA DEL JUEGO ---
+
+        function colocarComida() {
+            food = {
+                x: Math.floor(Math.random() * canvasSize) * box,
+                y: Math.floor(Math.random() * canvasSize) * box
+            };
+            // Evita que la comida aparezca sobre la serpiente
             for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = (i == 0) ? "#f8c8dc" : "#fff";
-                ctx.fillRect(snake[i].x, snake[i].y, box, box);
-                ctx.strokeStyle = "#222";
-                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+                if (food.x == snake[i].x && food.y == snake[i].y) {
+                    colocarComida();
+                    return;
+                }
             }
-
-            ctx.fillStyle = "#ff6b6b";
-            ctx.font = `${box}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('❤️', food.x + box / 2, food.y + box / 2 + 2); 
-
-            let snakeX = snake[0].x;
-            let snakeY = snake[0].y;
-
-            if (d == "LEFT") snakeX -= box;
-            if (d == "UP") snakeY -= box;
-            if (d == "RIGHT") snakeX += box;
-            if (d == "DOWN") snakeY += box;
-
-            if (snakeX == food.x && snakeY == food.y) {
-                score++;
-                food = {
-                    x: Math.floor(Math.random() * canvasSize) * box,
-                    y: Math.floor(Math.random() * canvasSize) * box
-                };
-            } else {
-                snake.pop();
-            }
-
-            let newHead = { x: snakeX, y: snakeY };
-
-            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
-                mostrarGameOver();
-                return;
-            }
-
-            snake.unshift(newHead);
         }
 
         function collision(head, array) {
@@ -227,7 +230,81 @@
             return false;
         }
 
-        let game = setInterval(draw, 150);
+        // --- LOOP PRINCIPAL (DRAW) ---
+        function draw() {
+            // Dibuja el fondo
+            ctx.fillStyle = "#222";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dibuja la serpiente
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = (i == 0) ? "#f8c8dc" : "#fff";
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                ctx.strokeStyle = "#222";
+                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+            }
+
+            // Dibuja la comida (corazón)
+            ctx.fillStyle = "#ff6b6b";
+            ctx.font = `${box}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('❤️', food.x + box / 2, food.y + box / 2 + 2);
+
+            // ¡NUEVO! Dibuja la puntuación
+            ctx.fillStyle = "#f8c8dc";
+            ctx.font = "24px Arial";
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText("❤️ " + score, 10, 10);
+
+            // Si no hay dirección, no te muevas
+            if (!d) return;
+
+            // Posición antigua de la cabeza
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            // Actualiza la dirección
+            if (d == "LEFT") snakeX -= box;
+            if (d == "UP") snakeY -= box;
+            if (d == "RIGHT") snakeX += box;
+            if (d == "DOWN") snakeY += box;
+
+            // Si come la comida
+            if (snakeX == food.x && snakeY == food.y) {
+                score++;
+                audioEat.currentTime = 0; // Reinicia el sonido por si acaso
+                audioEat.play(); // ¡NUEVO! Suena "comer"
+                colocarComida();
+
+                // ¡NUEVO! Acelera el juego
+                if (gameSpeed > 60) { // Pone un límite de velocidad
+                    gameSpeed -= 5; // Reduce el intervalo (más rápido)
+                    clearInterval(game);
+                    game = setInterval(draw, gameSpeed);
+                }
+                
+            } else {
+                // Saca la cola
+                snake.pop();
+            }
+
+            // Nueva cabeza
+            let newHead = { x: snakeX, y: snakeY };
+
+            // CONDICIÓN DE GAME OVER
+            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+                mostrarGameOver();
+                return;
+            }
+
+            snake.unshift(newHead);
+        }
+
     </script>
 </body>
 </html>
+</body>
+</html>
+
