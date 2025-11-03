@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Un juego para ti</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #111;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Evita el scroll */
+            touch-action: manipulation; /* Mejora la respuesta táctil */
+        }
+        h1 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #f8c8dc; /* Un rosa suave */
+        }
+        canvas {
+            background-color: #222;
+            border: 2px solid #f8c8dc;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(248, 200, 220, 0.5);
+        }
+        #controles {
+            display: grid;
+            grid-template-columns: repeat(3, 70px);
+            grid-template-rows: repeat(2, 70px);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        #controles button {
+            font-size: 2em;
+            border: none;
+            background-color: #333;
+            color: #f8c8dc;
+            border-radius: 10px;
+            cursor: pointer;
+            user-select: none; /* Evita seleccionar el texto del botón */
+        }
+        #controles button:active {
+            background-color: #555;
+        }
+        #btnArriba { grid-column: 2 / 3; grid-row: 1 / 2; }
+        #btnIzquierda { grid-column: 1 / 2; grid-row: 2 / 3; }
+        #btnAbajo { grid-column: 2 / 3; grid-row: 2 / 3; }
+        #btnDerecha { grid-column: 3 / 4; grid-row: 2 / 3; }
+
+        /* --- EL MENSAJE ESPECIAL --- */
+        #gameOverMensaje {
+            display: none; /* Oculto por defecto */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #f8c8dc;
+            font-size: 2.5em; /* Tamaño grande */
+            font-weight: bold;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box; /* Para que el padding no afecte el tamaño */
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Un juego solo para ti</h1>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+    
+    <div id="controles">
+        <button id="btnArriba">↑</button>
+        <button id="btnIzquierda">←</button>
+        <button id="btnAbajo">↓</button>
+        <button id="btnDerecha">→</button>
+    </div>
+
+    <div id="gameOverMensaje">
+        <span>eres lo mejor de mi vida preciosa &lt;3</span>
+    </div>
+
+    <script>
+        // Configuración del juego
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const box = 20; // Tamaño de cada cuadrito
+        const canvasSize = canvas.width / box;
+
+        let snake = [];
+        snake[0] = { x: 9 * box, y: 10 * box }; // Posición inicial
+
+        let food = {
+            x: Math.floor(Math.random() * canvasSize) * box,
+            y: Math.floor(Math.random() * canvasSize) * box
+        };
+
+        let score = 0;
+        let d; // Dirección
+
+        // Controles táctiles
+        document.getElementById('btnArriba').addEventListener('click', () => { if(d != "DOWN") d = "UP"; });
+        document.getElementById('btnAbajo').addEventListener('click', () => { if(d != "UP") d = "DOWN"; });
+        document.getElementById('btnIzquierda').addEventListener('click', () => { if(d != "RIGHT") d = "LEFT"; });
+        document.getElementById('btnDerecha').addEventListener('click', () => { if(d != "LEFT") d = "RIGHT"; });
+
+        // Función para mostrar el mensaje de Game Over
+        function mostrarGameOver() {
+            clearInterval(game); // Detiene el juego
+            const mensajeDiv = document.getElementById('gameOverMensaje');
+            mensajeDiv.style.display = 'flex'; // Muestra el mensaje
+        }
+
+        // Función principal del juego (Game Loop)
+        function draw() {
+            ctx.fillStyle = "#222"; // Fondo
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dibuja la serpiente
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = (i == 0) ? "#f8c8dc" : "#fff"; // Cabeza rosa, cuerpo blanco
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                ctx.strokeStyle = "#222";
+                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+            }
+
+            // Dibuja la comida (un corazón)
+            ctx.fillStyle = "#ff6b6b"; // Rojo corazón
+            ctx.font = `${box}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('❤️', food.x + box / 2, food.y + box / 2 + 2); // +2 para centrar el emoji
+
+            // Posición antigua de la cabeza
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            // Actualiza la dirección
+            if (d == "LEFT") snakeX -= box;
+            if (d == "UP") snakeY -= box;
+            if (d == "RIGHT") snakeX += box;
+            if (d == "DOWN") snakeY += box;
+
+            // Si come la comida
+            if (snakeX == food.x && snakeY == food.y) {
+                score++;
+                food = {
+                    x: Math.floor(Math.random() * canvasSize) * box,
+                    y: Math.floor(Math.random() * canvasSize) * box
+                };
+            } else {
+                // Saca la cola
+                snake.pop();
+            }
+
+            // Nueva cabeza
+            let newHead = { x: snakeX, y: snakeY };
+
+            // --- CONDICIÓN DE GAME OVER ---
+            // Choca con los bordes o consigo misma
+            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+                mostrarGameOver(); // ¡Aquí ocurre la magia!
+                return; // Detiene la función
+            }
+
+            snake.unshift(newHead);
+        }
+
+        // Revisa colisión con el cuerpo
+        function collision(head, array) {
+            for (let i = 0; i < array.length; i++) {
+                if (head.x == array[i].x && head.y == array[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Inicia el juego
+        let game = setInterval(draw, 150); // Velocidad de la serpiente
+    </script>
+</body>
+</html>
