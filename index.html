@@ -19,9 +19,9 @@
             touch-action: manipulation;
         }
 
-        /* --- PANTALLAS DE MENSAJES (Bienvenida y Game Over) --- */
+        /* --- PANTALLAS DE MENSAJES --- */
         .pantalla-overlay {
-            display: flex; /* Por defecto la de bienvenida se ve */
+            display: flex; 
             position: absolute;
             top: 0;
             left: 0;
@@ -29,7 +29,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.9);
             color: #f8c8dc;
-            font-size: 2.5em; 
+            font-size: 2.2em; 
             font-weight: bold;
             text-align: center;
             flex-direction: column;
@@ -38,27 +38,57 @@
             padding: 20px;
             box-sizing: border-box; 
             line-height: 1.4;
-            z-index: 100; /* Asegura que esté por encima de todo */
+            z-index: 100;
         }
         
         #gameOverMensaje {
             display: none; /* Oculto por defecto */
         }
+        
+        #playerNameInput {
+            font-size: 0.6em;
+            width: 80%;
+            max-width: 300px;
+            padding: 10px 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 2px solid #f8c8dc;
+            background-color: #333;
+            color: #eee;
+            text-align: center;
+            font-weight: bold;
+        }
+        #playerNameInput::placeholder {
+            color: #aaa;
+        }
+        
+        .scoreDisplay {
+            font-size: 0.6em;
+            margin-top: 15px;
+            color: #fff;
+            font-weight: normal;
+        }
+        #finalScoreDisplay {
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        #finalHighScoreDisplay {
+            color: #f8c8dc;
+        }
 
-        /* --- BOTONES DE MENÚ --- */
         .btnMenu {
-            font-size: 0.5em; /* Tamaño relativo al mensaje */
+            font-size: 0.5em; 
             padding: 15px 30px;
-            margin-top: 30px; 
-            background-color: #f8c8dc; /* Rosa */
-            color: #111; /* Texto oscuro */
+            margin-top: 25px; 
+            background-color: #f8c8dc; 
+            color: #111; 
             border: none;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
         }
         .btnMenu:active {
-            background-color: #fff; /* Efecto al presionar */
+            background-color: #fff; 
         }
 
         /* --- ELEMENTOS DEL JUEGO (Ocultos al inicio) --- */
@@ -66,35 +96,25 @@
             font-size: 1.5em;
             margin-bottom: 10px;
             color: #f8c8dc;
-            display: none; /* Oculto al inicio */
+            display: none; 
         }
         canvas {
             background-color: #222;
             border: 2px solid #f8c8dc;
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(248, 200, 220, 0.5);
-            display: none; /* Oculto al inicio */
-            position: relative; /* Para que la puntuación se vea bien */
+            display: none; 
+            position: relative; 
         }
         #controles {
-            display: none; /* Oculto al inicio */
+            display: none; 
             grid-template-columns: repeat(3, 70px);
             grid-template-rows: repeat(2, 70px);
             gap: 10px;
             margin-top: 20px;
         }
-        #controles button {
-            font-size: 2em;
-            border: none;
-            background-color: #333;
-            color: #f8c8dc;
-            border-radius: 10px;
-            cursor: pointer;
-            user-select: none;
-        }
-        #controles button:active {
-            background-color: #555;
-        }
+        #controles button { font-size: 2em; border: none; background-color: #333; color: #f8c8dc; border-radius: 10px; cursor: pointer; user-select: none; }
+        #controles button:active { background-color: #555; }
         #btnArriba { grid-column: 2 / 3; grid-row: 1 / 2; }
         #btnIzquierda { grid-column: 1 / 2; grid-row: 2 / 3; }
         #btnAbajo { grid-column: 2 / 3; grid-row: 2 / 3; }
@@ -105,16 +125,19 @@
 
     <div id="welcomeMensaje" class="pantalla-overlay">
         <span>¡Hola Preciosa! ❤️</span>
-        <span style="font-size: 0.6em; margin-top: 10px;">Te hice este jueguito</span>
+        <span id="highScoreDisplay" class="scoreDisplay">Puntaje Más Alto: 0</span>
+        <input type="text" id="playerNameInput" placeholder="Escribe tu nombre aquí">
         <button id="btnJugar" class="btnMenu">¡Jugar!</button>
     </div>
 
     <div id="gameOverMensaje" class="pantalla-overlay">
+        <span id="finalScoreDisplay">Tu puntaje: 0</span>
         <span>eres lo mejor de mi vida preciosa &lt;3</span>
+        <span id="finalHighScoreDisplay" class="scoreDisplay">¡NUEVO RÉCORD!</span>
         <button id="btnReiniciar" class="btnMenu">Volver a Jugar</button>
     </div>
 
-    <h1>Un juego solo para ti</h1>
+    <h1>¡Atrapa los puntos!</h1>
     <canvas id="gameCanvas" width="300" height="300"></canvas>
     <div id="controles">
         <button id="btnArriba">↑</button>
@@ -124,11 +147,15 @@
     </div>
 
     <audio id="backgroundMusic" src="musica.mp3" loop></audio>
-    <audio id="eatSound" src="comer.mp3"></audio> <audio id="loseSound" src="perder.mp3"></audio> <script>
+    <audio id="eatSound" src="comer.mp3"></audio>
+    <audio id="loseSound" src="perder.mp3"></audio>
+
+
+    <script>
         // --- CONFIGURACIÓN Y REFERENCIAS ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const box = 20;
+        const box = 20; // Tamaño de la cuadrícula
         const canvasSize = canvas.width / box;
 
         // Referencias a elementos
@@ -144,167 +171,213 @@
         const gameTitle = document.querySelector('h1');
         const gameControls = document.getElementById('controles');
 
-        // Variables del juego
-        let snake = [];
-        let food = {};
+        const playerNameInput = document.getElementById('playerNameInput');
+        const highScoreDisplay = document.getElementById('highScoreDisplay');
+        const finalScoreDisplay = document.getElementById('finalScoreDisplay');
+        const finalHighScoreDisplay = document.getElementById('finalHighScoreDisplay');
+
+        // --- ¡NUEVAS VARIABLES DE JUEGO (PAC-MAN) ---
+        let player;
+        let ghosts;
+        let pellets;
         let score = 0;
-        let d;
-        let gameSpeed = 150; // ¡NUEVO! Velocidad inicial
-        let game; // Variable para el loop
+        let d; // Dirección
+        let gameSpeed = 130; // Velocidad del juego
+        let game; 
+        let playerName = "Preciosa"; 
+        
+        // --- LÓGICA DE PUNTAJE MÁS ALTO (Sin cambios) ---
+        function cargarHighScore() {
+            const hsValue = localStorage.getItem('juegoNovia_hsValue') || 0;
+            const hsName = localStorage.getItem('juegoNovia_hsName') || 'Nadie';
+            highScoreDisplay.textContent = `Puntaje Más Alto: ${hsName} - ${hsValue}`;
+        }
+        document.addEventListener('DOMContentLoaded', cargarHighScore);
 
         // --- FUNCIONES DE INICIO Y FIN ---
 
-        // Al hacer clic en "Jugar"
         btnJugar.addEventListener('click', () => {
-            welcomeScreen.style.display = 'none'; // Oculta bienvenida
-            
-            // Muestra los elementos del juego
+            playerName = playerNameInput.value || "Preciosa"; 
+            welcomeScreen.style.display = 'none'; 
             gameTitle.style.display = 'block';
             canvas.style.display = 'block';
             gameControls.style.display = 'grid';
-
-            iniciarMusica(); // Inicia la música
-            iniciarJuego(); // Comienza el juego
+            iniciarMusica(); 
+            iniciarJuego(); 
         });
 
-        // Al hacer clic en "Volver a Jugar"
         btnReiniciar.addEventListener('click', () => {
-            location.reload(); // Recarga la página (la forma más fácil)
+            location.reload(); 
         });
 
         function iniciarMusica() {
             audioMusic.play().catch(e => console.log("Música detenida por el navegador"));
         }
 
+        // --- ¡NUEVO! iniciarJuego (Lógica Pac-Man) ---
         function iniciarJuego() {
-            snake = [{ x: 9 * box, y: 10 * box }];
             score = 0;
-            gameSpeed = 150;
-            d = undefined; // Sin dirección inicial
-            colocarComida();
+            d = undefined; 
+            player = { x: 9 * box, y: 10 * box }; // Posición inicial del jugador
+
+            // Posición inicial de los fantasmas
+            ghosts = [
+                { x: 1 * box, y: 1 * box, color: "#ffb8b8" }, // Fantasma rojo/rosa
+                { x: (canvasSize - 2) * box, y: 1 * box, color: "#b8fff8" }, // Fantasma cyan
+                { x: 1 * box, y: (canvasSize - 2) * box, color: "#f8d8b8" }, // Fantasma naranja
+                { x: (canvasSize - 2) * box, y: (canvasSize - 2) * box, color: "#ffc8f8" } // Fantasma rosa
+            ];
             
-            if(game) clearInterval(game); // Limpia cualquier loop anterior
-            game = setInterval(draw, gameSpeed); // Inicia el loop
+            // Llenar la pantalla de "pellets" (puntos)
+            pellets = [];
+            for (let x = 0; x < canvasSize; x++) {
+                for (let y = 0; y < canvasSize; y++) {
+                    // No poner un pellet donde empieza el jugador
+                    if (x === 9 && y === 10) continue; 
+                    
+                    let onGhost = false;
+                    for(let g of ghosts) {
+                        if (g.x === x * box && g.y === y * box) onGhost = true;
+                    }
+                    if (!onGhost) {
+                        pellets.push({ x: x * box, y: y * box });
+                    }
+                }
+            }
+            
+            if(game) clearInterval(game); 
+            game = setInterval(draw, gameSpeed); 
         }
         
         function mostrarGameOver() {
             clearInterval(game);
-            audioMusic.pause(); // Para la música de fondo
-            audioLose.play(); // Suena "perder"
+            audioMusic.pause(); 
+            audioLose.play(); 
             
-            // Oculta el juego y muestra la pantalla final
+            const hsValue = localStorage.getItem('juegoNovia_hsValue') || 0;
+            finalScoreDisplay.textContent = `${playerName}, tu puntaje: ${score}`;
+
+            if (score > hsValue) {
+                localStorage.setItem('juegoNovia_hsValue', score);
+                localStorage.setItem('juegoNovia_hsName', playerName);
+                finalHighScoreDisplay.textContent = `¡NUEVO RÉCORD!`;
+            } else {
+                const hsName = localStorage.getItem('juegoNovia_hsName') || 'Nadie';
+                finalHighScoreDisplay.textContent = `Puntaje más alto: ${hsName} - ${hsValue}`;
+            }
+
             gameTitle.style.display = 'none';
             canvas.style.display = 'none';
             gameControls.style.display = 'none';
             gameOverScreen.style.display = 'flex';
         }
 
-        // --- CONTROLES ---
+        // --- CONTROLES (Sin cambios) ---
         document.getElementById('btnArriba').addEventListener('click', () => { if(d != "DOWN") d = "UP"; });
         document.getElementById('btnAbajo').addEventListener('click', () => { if(d != "UP") d = "DOWN"; });
         document.getElementById('btnIzquierda').addEventListener('click', () => { if(d != "RIGHT") d = "LEFT"; });
         document.getElementById('btnDerecha').addEventListener('click', () => { if(d != "LEFT") d = "RIGHT"; });
 
-        // --- LÓGICA DEL JUEGO ---
-
-        function colocarComida() {
-            food = {
-                x: Math.floor(Math.random() * canvasSize) * box,
-                y: Math.floor(Math.random() * canvasSize) * box
-            };
-            // Evita que la comida aparezca sobre la serpiente
-            for (let i = 0; i < snake.length; i++) {
-                if (food.x == snake[i].x && food.y == snake[i].y) {
-                    colocarComida();
-                    return;
-                }
-            }
-        }
-
-        function collision(head, array) {
-            for (let i = 0; i < array.length; i++) {
-                if (head.x == array[i].x && head.y == array[i].y) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // --- LOOP PRINCIPAL (DRAW) ---
+        // --- ¡NUEVO! LOOP PRINCIPAL (DRAW) - Lógica Pac-Man ---
         function draw() {
-            // Dibuja el fondo
+            // 1. Dibuja el fondo
             ctx.fillStyle = "#222";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Dibuja la serpiente
-            for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = (i == 0) ? "#f8c8dc" : "#fff";
-                ctx.fillRect(snake[i].x, snake[i].y, box, box);
-                ctx.strokeStyle = "#222";
-                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-            }
-
-            // Dibuja la comida (corazón)
-            ctx.fillStyle = "#ff6b6b";
-            ctx.font = `${box}px Arial`;
+            // 2. Dibuja los Pellets (puntos)
+            ctx.fillStyle = "#f8c8dc"; // Puntos rosa pálido
+            ctx.font = `bold ${box}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('❤️', food.x + box / 2, food.y + box / 2 + 2);
+            for (let p of pellets) {
+                ctx.fillText('·', p.x + box / 2, p.y + box / 2);
+            }
 
-            // ¡NUEVO! Dibuja la puntuación
+            // 3. Dibuja al Jugador (un corazón)
             ctx.fillStyle = "#f8c8dc";
-            ctx.font = "24px Arial";
+            ctx.font = `${box}px Arial`;
+            ctx.fillText('❤️', player.x + box / 2, player.y + box / 2 + 2); // Usamos el corazón
+
+            // 4. Dibuja los Fantasmas
+            for (let g of ghosts) {
+                ctx.fillStyle = g.color;
+                ctx.font = `${box}px Arial`;
+                // Puedes usar 👻 o cuadrados de colores. Los emojis son más lindos.
+                ctx.fillText('👻', g.x + box / 2, g.y + box / 2 + 2);
+            }
+
+            // 5. Dibuja el Puntaje
+            ctx.fillStyle = "#fff";
+            ctx.font = "20px Arial";
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            ctx.fillText("❤️ " + score, 10, 10);
-
+            ctx.fillText(`${playerName}: ${score} pts`, 10, 10);
+            
             // Si no hay dirección, no te muevas
-            if (!d) return;
+            if (!d) return; 
 
-            // Posición antigua de la cabeza
-            let snakeX = snake[0].x;
-            let snakeY = snake[0].y;
+            // 6. Mueve al Jugador
+            let playerX = player.x;
+            let playerY = player.y;
+            if (d == "LEFT") playerX -= box;
+            if (d == "UP") playerY -= box;
+            if (d == "RIGHT") playerX += box;
+            if (d == "DOWN") playerY += box;
 
-            // Actualiza la dirección
-            if (d == "LEFT") snakeX -= box;
-            if (d == "UP") snakeY -= box;
-            if (d == "RIGHT") snakeX += box;
-            if (d == "DOWN") snakeY += box;
+            // 7. ¡NUEVO! Lógica de "Wrap" (atravesar paredes)
+            if (playerX < 0) playerX = (canvasSize - 1) * box;
+            if (playerX >= canvasSize * box) playerX = 0;
+            if (playerY < 0) playerY = (canvasSize - 1) * box;
+            if (playerY >= canvasSize * box) playerY = 0;
+            
+            player.x = playerX;
+            player.y = playerY;
 
-            // Si come la comida
-            if (snakeX == food.x && snakeY == food.y) {
-                score++;
-                audioEat.currentTime = 0; // Reinicia el sonido por si acaso
-                audioEat.play(); // ¡NUEVO! Suena "comer"
-                colocarComida();
-
-                // ¡NUEVO! Acelera el juego
-                if (gameSpeed > 60) { // Pone un límite de velocidad
-                    gameSpeed -= 5; // Reduce el intervalo (más rápido)
-                    clearInterval(game);
-                    game = setInterval(draw, gameSpeed);
+            // 8. Mueve los Fantasmas (IA simple de persecución)
+            for (let g of ghosts) {
+                // El fantasma decide si moverse en X o en Y
+                if (Math.random() < 0.5) { // 50% de probabilidad de moverse en X
+                    if (g.x < player.x) g.x += box;
+                    else if (g.x > player.x) g.x -= box;
+                } else { // 50% de probabilidad de moverse en Y
+                    if (g.y < player.y) g.y += box;
+                    else if (g.y > player.y) g.y -= box;
                 }
-                
-            } else {
-                // Saca la cola
-                snake.pop();
+
+                // Wrap para los fantasmas también
+                if (g.x < 0) g.x = (canvasSize - 1) * box;
+                if (g.x >= canvasSize * box) g.x = 0;
+                if (g.y < 0) g.y = (canvasSize - 1) * box;
+                if (g.y >= canvasSize * box) g.y = 0;
             }
 
-            // Nueva cabeza
-            let newHead = { x: snakeX, y: snakeY };
+            // 9. Revisar Colisiones
+            // a) ¿Jugador choca con fantasma? = GAME OVER
+            for (let g of ghosts) {
+                if (player.x === g.x && player.y === g.y) {
+                    mostrarGameOver();
+                    return;
+                }
+            }
+            
+            // b) ¿Jugador come un pellet?
+            for (let i = 0; i < pellets.length; i++) {
+                if (player.x === pellets[i].x && player.y === pellets[i].y) {
+                    score += 10; // 10 puntos por pellet
+                    audioEat.currentTime = 0; 
+                    audioEat.play();
+                    pellets.splice(i, 1); // Quita el pellet comido
+                    break; 
+                }
+            }
 
-            // CONDICIÓN DE GAME OVER
-            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
-                mostrarGameOver();
+            // 10. ¡NUEVO! Revisar Condición de Victoria
+            if (pellets.length === 0) {
+                score += 1000; // ¡Bonus de 1000 puntos por limpiar la pantalla!
+                mostrarGameOver(); // Muestra la pantalla final (contará como récord)
                 return;
             }
-
-            snake.unshift(newHead);
         }
-
     </script>
 </body>
 </html>
-</body>
-</html>
-
