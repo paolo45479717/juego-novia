@@ -1,119 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-ARC">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Un juego para ti</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #111;
-            color: #eee;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            touch-action: manipulation;
-        }
-
-        /* --- PANTALLAS DE MENSAJES --- */
-        .pantalla-overlay {
-            display: flex; 
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #f8c8dc;
-            font-size: 2.2em; 
-            font-weight: bold;
-            text-align: center;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box; 
-            line-height: 1.4;
-            z-index: 100;
-        }
-        
-        #gameOverMensaje {
-            display: none;
-        }
-        
-        #playerNameInput {
-            font-size: 0.6em;
-            width: 80%;
-            max-width: 300px;
-            padding: 10px 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            border: 2px solid #f8c8dc;
-            background-color: #333;
-            color: #eee;
-            text-align: center;
-            font-weight: bold;
-        }
-        #playerNameInput::placeholder {
-            color: #aaa;
-        }
-        
-        .scoreDisplay {
-            font-size: 0.6em;
-            margin-top: 15px;
-            color: #fff;
-            font-weight: normal;
-        }
-        #finalScoreDisplay {
-            font-size: 0.8em;
-            margin-bottom: 10px;
-        }
-        #finalHighScoreDisplay {
-            color: #f8c8dc;
-        }
-
-        .btnMenu {
-            font-size: 0.5em; 
-            padding: 15px 30px;
-            margin-top: 25px; 
-            background-color: #f8c8dc; 
-            color: #111; 
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btnMenu:active {
-            background-color: #fff; 
-        }
-
-        /* --- ELEMENTOS DEL JUEGO (Ocultos al inicio) --- */
-        h1 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #f8c8dc;
-            display: none; 
-        }
-        canvas {
-            background-color: #222;
-            border: 2px solid #f8c8dc;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(248, 200, 220, 0.5);
-            display: none; 
-            position: relative; 
-        }
-        #controles {
-            display: none; 
-            grid-template-columns: repeat(3, 70px);
-            grid-template-rows: repeat(2, 70px);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        /* ... (estilos de botones de control) ... */
+        /* --- (El CSS es exactamente el mismo que antes) --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #111; color: #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
+        .pantalla-overlay { display: flex; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); color: #f8c8dc; font-size: 2.2em; font-weight: bold; text-align: center; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; line-height: 1.4; z-index: 100; }
+        #gameOverMensaje { display: none; }
+        #playerNameInput { font-size: 0.6em; width: 80%; max-width: 300px; padding: 10px 15px; margin-top: 20px; border-radius: 8px; border: 2px solid #f8c8dc; background-color: #333; color: #eee; text-align: center; font-weight: bold; }
+        #playerNameInput::placeholder { color: #aaa; }
+        .scoreDisplay { font-size: 0.6em; margin-top: 15px; color: #fff; font-weight: normal; }
+        #finalScoreDisplay { font-size: 0.8em; margin-bottom: 10px; }
+        #finalHighScoreDisplay { color: #f8c8dc; }
+        .btnMenu { font-size: 0.5em; padding: 15px 30px; margin-top: 25px; background-color: #f8c8dc; color: #111; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .btnMenu:active { background-color: #fff; }
+        h1 { font-size: 1.5em; margin-bottom: 10px; color: #f8c8dc; display: none; }
+        canvas { background-color: #222; border: 2px solid #f8c8dc; border-radius: 8px; box-shadow: 0 0 15px rgba(248, 200, 220, 0.5); display: none; position: relative; }
+        #controles { display: none; grid-template-columns: repeat(3, 70px); grid-template-rows: repeat(2, 70px); gap: 10px; margin-top: 20px; }
         #controles button { font-size: 2em; border: none; background-color: #333; color: #f8c8dc; border-radius: 10px; cursor: pointer; user-select: none; }
         #controles button:active { background-color: #555; }
         #btnArriba { grid-column: 2 / 3; grid-row: 1 / 2; }
@@ -138,7 +43,7 @@
         <button id="btnReiniciar" class="btnMenu">Volver a Jugar</button>
     </div>
 
-    <h1>¡Atrapa los puntos!</h1>
+    <h1 id="gameTitle">¡Nivel 1!</h1>
     <canvas id="gameCanvas" width="300" height="300"></canvas>
     <div id="controles">
         <button id="btnArriba">↑</button>
@@ -168,7 +73,7 @@
         const btnJugar = document.getElementById('btnJugar');
         const btnReiniciar = document.getElementById('btnReiniciar');
 
-        const gameTitle = document.querySelector('h1');
+        const gameTitle = document.getElementById('gameTitle'); // ¡MODIFICADO!
         const gameControls = document.getElementById('controles');
 
         const playerNameInput = document.getElementById('playerNameInput');
@@ -176,21 +81,23 @@
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const finalHighScoreDisplay = document.getElementById('finalHighScoreDisplay');
 
-        // --- VARIABLES DE JUEGO (PAC-MAN) ---
+        // --- VARIABLES DE JUEGO ---
         let player;
         let ghosts;
         let pellets;
-        let powerPellets; // ¡NUEVO!
+        let powerPellets; 
         let score = 0;
         let d; 
-        let gameSpeed = 150; // ¡MODIFICADO! Más lento (antes 130)
         let game; 
         let playerName = "Preciosa"; 
 
-        // ¡NUEVO! Variables de Power-Up
+        // --- ¡NUEVAS VARIABLES DE NIVELES Y DIFICULTAD! ---
+        let level = 1;
+        let gameSpeed = 150; // Velocidad inicial
+        let powerUpDuration = 100; // Duración inicial
         let isPoweredUp = false;
         let powerUpTimer = 0;
-        const POWER_UP_DURATION = 100; // 100 ticks (100 * 150ms = 15 segundos)
+        
         
         // --- LÓGICA DE PUNTAJE MÁS ALTO ---
         function cargarHighScore() {
@@ -209,7 +116,7 @@
             canvas.style.display = 'block';
             gameControls.style.display = 'grid';
             iniciarMusica(); 
-            iniciarJuego(); 
+            iniciarJuego(); // ¡NUEVO! Llama a la función master
         });
 
         btnReiniciar.addEventListener('click', () => {
@@ -220,15 +127,38 @@
             audioMusic.play().catch(e => console.log("Música detenida por el navegador"));
         }
 
-        // --- ¡MODIFICADO! iniciarJuego (Lógica Pac-Man) ---
+        // --- ¡NUEVO! Función Master para el primer inicio ---
         function iniciarJuego() {
             score = 0;
+            level = 1;
+            gameSpeed = 150;
+            powerUpDuration = 100;
+            setUpLevel(); // Llama a la función que prepara el tablero
+        }
+        
+        // --- ¡NUEVO! Función para pasar al siguiente nivel ---
+        function nextLevel() {
+            clearInterval(game);
+            level++;
+            score += 1000; // Bonus por pasar de nivel
+            
+            // Incrementar dificultad
+            gameSpeed = Math.max(60, gameSpeed - 10); // Más rápido (con un límite)
+            powerUpDuration = Math.max(20, powerUpDuration - 10); // Poder más corto (con un límite)
+            
+            audioEat.play(); // Sonido de victoria
+            setUpLevel(); // Prepara el nuevo nivel
+        }
+
+        // --- ¡MODIFICADO! Esta función ahora prepara CUALQUIER nivel ---
+        // (Antes se llamaba iniciarJuego)
+        function setUpLevel() {
+            gameTitle.textContent = `¡Nivel ${level}!`; // ¡MODIFICADO!
             d = undefined; 
             isPoweredUp = false;
             powerUpTimer = 0;
             player = { x: 9 * box, y: 10 * box }; 
 
-            // ¡MODIFICADO! Fantasmas ahora guardan su spawn
             ghosts = [
                 { x: 1 * box, y: 1 * box, color: "#ffb8b8", spawnX: 1 * box, spawnY: 1 * box },
                 { x: (canvasSize - 2) * box, y: 1 * box, color: "#b8fff8", spawnX: (canvasSize - 2) * box, spawnY: 1 * box },
@@ -237,18 +167,16 @@
             ];
             
             pellets = [];
-            powerPellets = []; // ¡NUEVO!
+            powerPellets = []; 
             for (let x = 0; x < canvasSize; x++) {
                 for (let y = 0; y < canvasSize; y++) {
-                    if (x === 9 && y === 10) continue; // Skip player start
-                    
+                    if (x === 9 && y === 10) continue; 
                     let onGhost = false;
                     for(let g of ghosts) {
                         if (g.x === x * box && g.y === y * box) onGhost = true;
                     }
                     if(onGhost) continue; 
 
-                    // ¡NUEVO! Pone Uvas (Power Pellets) en las esquinas
                     if ((x === 0 && y === 0) || 
                         (x === canvasSize - 1 && y === 0) || 
                         (x === 0 && y === canvasSize - 1) || 
@@ -261,7 +189,7 @@
             }
             
             if(game) clearInterval(game); 
-            game = setInterval(draw, gameSpeed); 
+            game = setInterval(draw, gameSpeed); // ¡MODIFICADO! Usa la velocidad del nivel
         }
         
         function mostrarGameOver() {
@@ -270,7 +198,8 @@
             audioLose.play(); 
             
             const hsValue = localStorage.getItem('juegoNovia_hsValue') || 0;
-            finalScoreDisplay.textContent = `${playerName}, tu puntaje: ${score}`;
+            // ¡MODIFICADO! Muestra el nivel alcanzado
+            finalScoreDisplay.textContent = `${playerName}, Nivel ${level} - ${score} pts`;
 
             if (score > hsValue) {
                 localStorage.setItem('juegoNovia_hsValue', score);
@@ -287,19 +216,32 @@
             gameOverScreen.style.display = 'flex';
         }
 
-        // --- CONTROLES ---
+        // --- CONTROLES (PC y Móvil, sin cambios) ---
         document.getElementById('btnArriba').addEventListener('click', () => { if(d != "DOWN") d = "UP"; });
         document.getElementById('btnAbajo').addEventListener('click', () => { if(d != "UP") d = "DOWN"; });
         document.getElementById('btnIzquierda').addEventListener('click', () => { if(d != "RIGHT") d = "LEFT"; });
         document.getElementById('btnDerecha').addEventListener('click', () => { if(d != "LEFT") d = "RIGHT"; });
+        document.addEventListener('keydown', (e) => {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                e.preventDefault();
+            }
+            if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") {
+                if(d != "DOWN") d = "UP";
+            } else if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") {
+                if(d != "UP") d = "DOWN";
+            } else if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+                if(d != "RIGHT") d = "LEFT";
+            } else if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+                if(d != "LEFT") d = "RIGHT";
+            }
+        });
 
-        // --- ¡MODIFICADO! LOOP PRINCIPAL (DRAW) ---
+        // --- LOOP PRINCIPAL (DRAW) ---
         function draw() {
-            // 1. Dibuja el fondo
+            // ... (Casi todo draw() es igual) ...
+            
             ctx.fillStyle = "#222";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // 2. Dibuja los Pellets (puntos)
             ctx.fillStyle = "#f8c8dc"; 
             ctx.font = `bold ${box}px Arial`;
             ctx.textAlign = 'center';
@@ -307,47 +249,38 @@
             for (let p of pellets) {
                 ctx.fillText('·', p.x + box / 2, p.y + box / 2);
             }
-
-            // 3. ¡NUEVO! Dibuja las Uvas (Power Pellets)
-            ctx.fillStyle = "#f8c8dc"; // Mismo color, emoji diferente
+            ctx.fillStyle = "#f8c8dc"; 
             ctx.font = `${box}px Arial`;
             for (let p of powerPellets) {
                 ctx.fillText('🍇', p.x + box / 2, p.y + box / 2 + 2);
             }
-
-            // 4. Dibuja al Jugador (corazón)
             ctx.fillStyle = "#f8c8dc";
             ctx.font = `${box}px Arial`;
             ctx.fillText('❤️', player.x + box / 2, player.y + box / 2 + 2); 
-
-            // 5. ¡MODIFICADO! Dibuja los Fantasmas
             for (let g of ghosts) {
                 if (isPoweredUp) {
-                    ctx.fillStyle = "#aaa"; // ¡NUEVO! Color vulnerable
+                    ctx.fillStyle = "#aaa"; 
                 } else {
-                    ctx.fillStyle = g.color; // Color normal
+                    ctx.fillStyle = g.color; 
                 }
                 ctx.fillText('👻', g.x + box / 2, g.y + box / 2 + 2);
             }
 
-            // 6. Dibuja el Puntaje
+            // ¡MODIFICADO! Muestra el nivel en el puntaje
             ctx.fillStyle = "#fff";
             ctx.font = "20px Arial";
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            ctx.fillText(`${playerName}: ${score} pts`, 10, 10);
+            ctx.fillText(`${playerName}: ${score} (Nivel ${level})`, 10, 10);
             
-            // 7. ¡NUEVO! Manejar el Power-Up Timer
             if (isPoweredUp) {
                 powerUpTimer--;
                 if (powerUpTimer <= 0) {
                     isPoweredUp = false;
                 }
             }
-
             if (!d) return; 
 
-            // 8. Mueve al Jugador
             let playerX = player.x;
             let playerY = player.y;
             if (d == "LEFT") playerX -= box;
@@ -355,7 +288,6 @@
             if (d == "RIGHT") playerX += box;
             if (d == "DOWN") playerY += box;
 
-            // Lógica de "Wrap" (atravesar paredes)
             if (playerX < 0) playerX = (canvasSize - 1) * box;
             if (playerX >= canvasSize * box) playerX = 0;
             if (playerY < 0) playerY = (canvasSize - 1) * box;
@@ -364,19 +296,16 @@
             player.x = playerX;
             player.y = playerY;
 
-            // 9. ¡MODIFICADO! Mueve los Fantasmas (IA de persecución o huida)
             for (let g of ghosts) {
                 if (isPoweredUp) {
-                    // ¡NUEVO! IA de Huida
                     if (Math.random() < 0.5) { 
-                        if (g.x < player.x) g.x -= box; // Moverse *lejos* de X
+                        if (g.x < player.x) g.x -= box; 
                         else if (g.x > player.x) g.x += box;
                     } else { 
-                        if (g.y < player.y) g.y -= box; // Moverse *lejos* de Y
+                        if (g.y < player.y) g.y -= box; 
                         else if (g.y > player.y) g.y += box;
                     }
                 } else {
-                    // IA de Persecución (original)
                     if (Math.random() < 0.5) { 
                         if (g.x < player.x) g.x += box;
                         else if (g.x > player.x) g.x -= box;
@@ -386,35 +315,29 @@
                     }
                 }
                 
-                // Wrap para fantasmas
                 if (g.x < 0) g.x = (canvasSize - 1) * box;
                 if (g.x >= canvasSize * box) g.x = 0;
                 if (g.y < 0) g.y = (canvasSize - 1) * box;
                 if (g.y >= canvasSize * box) g.y = 0;
             }
 
-            // 10. ¡MODIFICADO! Revisar Colisiones
-            // a) ¿Jugador choca con fantasma?
             for (let i = 0; i < ghosts.length; i++) {
                 let g = ghosts[i];
                 if (player.x === g.x && player.y === g.y) {
                     if (isPoweredUp) {
-                        // ¡NUEVO! Come al fantasma
-                        score += 200; // Puntos extra
-                        g.x = g.spawnX; // Lo envía a su "casa"
+                        score += 200; 
+                        g.x = g.spawnX; 
                         g.y = g.spawnY;
                         audioEat.currentTime = 0; 
                         audioEat.play();
                     } else {
-                        // GAME OVER
                         mostrarGameOver();
                         return;
                     }
                 }
             }
             
-            // b) ¿Jugador come un pellet?
-            for (let i = pellets.length - 1; i >= 0; i--) { // Iterar al revés para borrar
+            for (let i = pellets.length - 1; i >= 0; i--) { 
                 if (player.x === pellets[i].x && player.y === pellets[i].y) {
                     score += 10; 
                     audioEat.currentTime = 0; 
@@ -424,25 +347,24 @@
                 }
             }
 
-            // c) ¡NUEVO! ¿Jugador come una uva (power pellet)?
             for (let i = powerPellets.length - 1; i >= 0; i--) {
                 if (player.x === powerPellets[i].x && player.y === powerPellets[i].y) {
                     isPoweredUp = true;
-                    powerUpTimer = POWER_UP_DURATION;
-                    audioEat.currentTime = 0; // Reusar el sonido de comer
+                    powerUpTimer = powerUpDuration; // ¡MODIFICADO! Usa la duración del nivel
+                    audioEat.currentTime = 0; 
                     audioEat.play();
-                    powerPellets.splice(i, 1); // Quita la uva
+                    powerPellets.splice(i, 1); 
                     break; 
                 }
             }
 
-            // 11. Revisar Condición de Victoria
+            // --- ¡LA LÓGICA DE GANAR AHORA LLAMA A nextLevel()! ---
             if (pellets.length === 0 && powerPellets.length === 0) {
-                score += 1000; 
-                mostrarGameOver(); 
+                nextLevel(); // ¡MODIFICADO!
                 return;
             }
         }
     </script>
 </body>
 </html>
+
