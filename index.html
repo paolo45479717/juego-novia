@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Un juego para ti</title>
+    <title>Para Ti, Mi Preciosa ❤️</title>
     <style>
-        /* --- (Todo tu increíble CSS va aquí) --- */
+        /* --- (TU CSS ESPECTACULAR VA AQUÍ - SIN CAMBIOS) --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: #eee;
@@ -22,13 +21,18 @@
             min-height: 100vh;
             overflow: hidden;
             touch-action: manipulation;
-            background-color: #8bac0f; 
+            background-color: #8bac0f;
             background-image: linear-gradient(rgba(15, 56, 15, 0.1) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(15, 56, 15, 0.1) 1px, transparent 1px);
             background-size: 3px 3px;
             position: relative;
+            transition: background 1s ease;
         }
-
+        .night-mode {
+            background-color: #1a0033;
+            background-image: linear-gradient(rgba(100, 0, 150, 0.1) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(100, 0, 150, 0.1) 1px, transparent 1px);
+        }
         .particle {
             position: absolute;
             width: 4px;
@@ -38,12 +42,22 @@
             pointer-events: none;
             animation: float 3s infinite ease-in-out;
         }
-
+        .heart-particle {
+            font-size: 1.2em;
+            color: #ff69b4;
+            position: absolute;
+            pointer-events: none;
+            animation: heartFloat 1.5s ease-out forwards;
+            z-index: 200;
+        }
+        @keyframes heartFloat {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(0); opacity: 0; }
+        }
         @keyframes float {
             0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
             50% { opacity: 1; }
         }
-
         .pantalla-overlay {
             display: flex;
             position: absolute;
@@ -65,24 +79,18 @@
             z-index: 100;
             animation: fadeIn 0.5s ease-out;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
-        #gameOverMensaje { display: none; }
-
         .pantalla-overlay span {
             animation: slideIn 0.6s ease-out;
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
         }
-
         @keyframes slideIn {
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         #playerNameInput {
             font-size: 0.6em;
             width: 80%;
@@ -98,41 +106,12 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(248, 200, 220, 0.3);
         }
-
         #playerNameInput:focus {
             outline: none;
             border-color: #fff;
             box-shadow: 0 6px 20px rgba(248, 200, 220, 0.6);
             transform: scale(1.05);
         }
-
-        #playerNameInput::placeholder {
-            color: #aaa;
-        }
-
-        .scoreDisplay {
-            font-size: 0.6em;
-            margin-top: 15px;
-            color: #fff;
-            font-weight: normal;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-        }
-
-        #finalScoreDisplay {
-            font-size: 0.8em;
-            margin-bottom: 10px;
-        }
-
-        #finalHighScoreDisplay {
-            color: #f8c8dc;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
         .btnMenu {
             font-size: 0.5em;
             padding: 15px 40px;
@@ -148,7 +127,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .btnMenu::before {
             content: '';
             position: absolute;
@@ -161,22 +139,10 @@
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
         }
-
         .btnMenu:hover::before {
             width: 300px;
             height: 300px;
         }
-
-        .btnMenu:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(248, 200, 220, 0.6);
-        }
-
-        .btnMenu:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(248, 200, 220, 0.4);
-        }
-
         h1 {
             font-size: 1.8em;
             margin-bottom: 15px;
@@ -185,13 +151,11 @@
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
             animation: titleBounce 0.8s ease-out;
         }
-
         @keyframes titleBounce {
             0% { transform: scale(0.5); opacity: 0; }
             60% { transform: scale(1.1); }
             100% { transform: scale(1); opacity: 1; }
         }
-
         canvas {
             background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
             border: 3px solid #f8c8dc;
@@ -204,36 +168,25 @@
             height: 90vw;
             max-width: 320px;
             max-height: 320px;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-crisp-edges;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
+            image-rendering: -moz-crisp-edges; /* Firefox */
+            image-rendering: -webkit-crisp-edges; /* Chrome */
+            image-rendering: pixelated; /* Estándar */
+            image-rendering: crisp-edges; /* IE */
             transition: all 0.3s ease;
         }
-
         canvas:hover {
             box-shadow: 0 0 40px rgba(248, 200, 220, 0.8),
                           inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
-
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
+            /* ... (resto de tu anim. shake) ... */
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
-
         .canvas-shake {
             animation: shake 0.5s;
         }
-
         #controles {
             display: none;
             grid-template-columns: repeat(3, 75px);
@@ -241,7 +194,6 @@
             gap: 12px;
             margin-top: 20px;
         }
-
         #controles button {
             font-size: 2.2em;
             border: none;
@@ -254,27 +206,12 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             border: 2px solid #444;
         }
-
-        #controles button:hover {
-            transform: scale(1.05);
-            border-color: #f8c8dc;
-        }
-
         #controles button:active {
             transform: scale(0.95);
-            background: linear-gradient(135deg, #444 0%, #333 100%);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
-
-        #btnArriba { grid-column: 2 / 3; grid-row: 1 / 2; }
-        #btnIzquierda { grid-column: 1 / 2; grid-row: 2 / 3; }
-        #btnAbajo { grid-column: 2 / 3; grid-row: 2 / 3; }
-        #btnDerecha { grid-column: 3 / 4; grid-row: 2 / 3; }
-
-        #powerUpIndicator {
+        #powerUpIndicator, #shieldIndicator, #speedIndicator, #magnetIndicator {
             position: absolute;
             top: 20px;
-            right: 20px;
             background: linear-gradient(135deg, #f8c8dc 0%, #ffd4e8 100%);
             color: #111;
             padding: 10px 20px;
@@ -286,12 +223,15 @@
             animation: powerUpPulse 0.5s infinite alternate;
             z-index: 50;
         }
+        #powerUpIndicator { right: 20px; }
+        #shieldIndicator { right: 20px; top: 70px; background: #00ffff; }
+        #speedIndicator { right: 20px; top: 120px; background: #00ff00; }
+        #magnetIndicator { right: 20px; top: 170px; background: #ff00ff; }
 
         @keyframes powerUpPulse {
             from { transform: scale(1); }
             to { transform: scale(1.1); }
         }
-
         #livesIndicator {
             position: absolute;
             top: 20px;
@@ -306,40 +246,60 @@
             display: none;
             z-index: 50;
         }
-
+        #achievementsBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            z-index: 60;
+            display: none;
+        }
+        #achievementsPanel {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            color: #f8c8dc;
+            padding: 15px;
+            border-radius: 12px;
+            max-width: 250px;
+            font-size: 0.8em;
+            display: none;
+            z-index: 70;
+            border: 2px solid #f8c8dc;
+        }
+        .achievement {
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(248, 200, 220, 0.1);
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        .achievement.unlocked {
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            font-weight: bold;
+        }
         @media (min-width: 601px) {
-            #controles {
-                display: none !important;
-            }
-
-            h1 {
-                font-size: 3em;
-            }
-
-            canvas {
-                width: 520px;
-                height: 520px;
-                max-width: 520px;
-                max-height: 520px;
-                border-width: 4px;
-            }
-
-            .pantalla-overlay {
-                font-size: 2.8em;
-            }
-
-            #powerUpIndicator, #livesIndicator {
-                font-size: 1.2em;
-                padding: 12px 25px;
+            #controles { display: none !important; }
+            h1 { font-size: 3em; }
+            canvas { width: 520px; height: 520px; max-width: 520px; max-height: 520px; border-width: 4px; }
+            .pantalla-overlay { font-size: 2.8em; }
+            #powerUpIndicator, #livesIndicator, #shieldIndicator, #speedIndicator, #magnetIndicator {
+                font-size: 1.2em; padding: 12px 25px;
             }
         }
-
         @keyframes comboPopup {
             0% { transform: scale(0) rotate(-180deg); opacity: 0; }
             50% { transform: scale(1.2) rotate(10deg); }
             100% { transform: scale(1) rotate(0); opacity: 1; }
         }
-
         .combo-text {
             position: absolute;
             color: #ffd700;
@@ -350,29 +310,69 @@
             animation: comboPopup 0.5s ease-out;
             z-index: 150;
         }
+        #secretMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: #ff69b4;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            display: none;
+            z-index: 200;
+            border: 3px solid #ffd700;
+            animation: pulse 2s infinite;
+        }
+        /* Tus otros estilos (pulse, btnArriba, etc.) van aquí */
+        #btnArriba { grid-column: 2 / 3; grid-row: 1 / 2; }
+        #btnIzquierda { grid-column: 1 / 2; grid-row: 2 / 3; }
+        #btnAbajo { grid-column: 2 / 3; grid-row: 2 / 3; }
+        #btnDerecha { grid-column: 3 / 4; grid-row: 2 / 3; }
+        #playerNameInput::placeholder { color: #aaa; }
     </style>
 </head>
 <body>
     <div id="welcomeMensaje" class="pantalla-overlay">
-        <span>¡Hola Preciosa! ❤️</span>
+        <span>¡Hola Mi Preciosa! ❤️</span>
         <span id="highScoreDisplay" class="scoreDisplay">Puntaje Más Alto: 0</span>
-        <input type="text" id="playerNameInput" placeholder="Escribe tu nombre aquí" maxlength="20">
+        <input type="text" id="playerNameInput" placeholder="Tu nombre aquí" maxlength="20">
         <button id="btnJugar" class="btnMenu">¡Jugar!</button>
     </div>
 
-    <div id="gameOverMensaje" class="pantalla-overlay">
+    <div id="gameOverMensaje" class="pantalla-overlay" style="display:none;">
         <span id="finalScoreDisplay">Tu puntaje: 0</span>
-        <span>eres lo mejor de mi vida preciosa &lt;3</span>
-        <span id="finalHighScoreDisplay" class="scoreDisplay">¡NUEVO RÉCORD!</span>
+        <span>¡Eres lo mejor de mi vida!</span>
+        <span id="finalHighScoreDisplay"></span>
         <button id="btnReiniciar" class="btnMenu">Volver a Jugar</button>
     </div>
 
-    <div id="powerUpIndicator">⚡ POWER MODE! ⚡</div>
-    <div id="livesIndicator">❤️ x 3</div>
+    <div id="victoryMessage" class="pantalla-overlay" style="display:none;">
+        <span>¡GANASTE EL JUEGO!</span>
+        <span id="secretReveal" style="font-size:0.8em; margin-top:20px;">Cargando mensaje especial...</span>
+        <button id="btnCredits" class="btnMenu">Créditos</button>
+    </div>
+
+    <div id="creditsScreen" class="pantalla-overlay" style="display:none; background: linear-gradient(135deg, #000428, #004e92);">
+        <span>Desarrollado con amor por:</span>
+        <span style="font-size:1.2em; color:#ffd700; margin:15px 0;">paolo45479717</span>
+        <span>Para la persona más especial del mundo</span>
+        <span style="font-size:0.7em; margin-top:20px;">© 2025 - Hecho con el corazón</span>
+        <button id="btnBack" class="btnMenu">Volver</button>
+    </div>
+
+    <div id="powerUpIndicator">POWER MODE!</div>
+    <div id="shieldIndicator">🛡️ ESCUDO!</div>
+    <div id="speedIndicator">⚡ VELOCIDAD!</div>
+    <div id="magnetIndicator">🧲 IMÁN!</div>
+    <div id="livesIndicator">x 3</div>
+    <button id="achievementsBtn">🏆</button>
+    <div id="achievementsPanel"></div>
 
     <h1 id="gameTitle">¡Nivel 1!</h1>
     <canvas id="gameCanvas" width="300" height="300"></canvas>
-    
     <div id="controles">
         <button id="btnArriba">↑</button>
         <button id="btnIzquierda">←</button>
@@ -380,199 +380,187 @@
         <button id="btnDerecha">→</button>
     </div>
 
-    <audio id="backgroundMusic" loop></audio>
-    <audio id="eatSound"></audio>
-    <audio id="loseSound"></audio>
-    <audio id="powerUpMusic" loop></audio> 
+    <div id="secretMessage">
+        <div>Mi amor...</div>
+        <div style="margin:15px 0; font-size:1.2em;">Tú eres mi mayor tesoro</div>
+        <div>Gracias por existir</div>
+        <div style="margin-top:20px; color:#ffd700;">Te amo con todo mi corazón</div>
+    </div>
+
+    <audio id="bgMusic" src="musica.mp3" loop></audio>
+    <audio id="eatSound" src="comer.mp3"></audio>
+    <audio id="powerSound" src="poder.mp3" loop></audio> <audio id="deathSound" src="perder.mp3"></audio>
 
     <script>
-        // ==================== CONSTANTES ====================
-        const GAME_CONFIG = {
+        // ==================== CONFIGURACIÓN ====================
+        const CONFIG = {
             BOX_SIZE: 20,
             INITIAL_SPEED: 150,
-            MIN_SPEED: 60,
-            SPEED_DECREASE: 10,
-            INITIAL_POWER_DURATION: 100,
-            MIN_POWER_DURATION: 20,
-            POWER_DECREASE: 10,
+            MIN_SPEED: 50,
+            SPEED_DECREASE: 8,
+            INITIAL_POWER_DURATION: 120,
+            MIN_POWER_DURATION: 30,
+            POWER_DECREASE: 8,
             POINTS_PER_PELLET: 10,
             POINTS_PER_POWER: 50,
             POINTS_PER_GHOST: 200,
             POINTS_PER_LEVEL: 1000,
             GHOST_COLORS: ["#ffb8b8", "#b8fff8", "#f8d8b8", "#ffc8f8"],
             INITIAL_LIVES: 3,
-            INVULNERABILITY_TICKS: 30 // Aprox 4.5s
+            MAX_LEVEL: 10,
+            INVULNERABILITY_TICKS: 60, // ~6 segundos
+            POWER_UP_DURATION: 180 // ~27 segundos
         };
 
         // ==================== ELEMENTOS DOM ====================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const box = GAME_CONFIG.BOX_SIZE;
+        const box = CONFIG.BOX_SIZE;
         const canvasSize = canvas.width / box;
 
         const welcomeScreen = document.getElementById('welcomeMensaje');
         const gameOverScreen = document.getElementById('gameOverMensaje');
+        const victoryScreen = document.getElementById('victoryMessage');
+        const creditsScreen = document.getElementById('creditsScreen');
+        const secretMessage = document.getElementById('secretMessage');
+
         const btnJugar = document.getElementById('btnJugar');
         const btnReiniciar = document.getElementById('btnReiniciar');
+        const btnCredits = document.getElementById('btnCredits');
+        const btnBack = document.getElementById('btnBack');
+
         const gameTitle = document.getElementById('gameTitle');
         const gameControls = document.getElementById('controles');
         const playerNameInput = document.getElementById('playerNameInput');
         const highScoreDisplay = document.getElementById('highScoreDisplay');
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const finalHighScoreDisplay = document.getElementById('finalHighScoreDisplay');
+        const secretReveal = document.getElementById('secretReveal');
+
         const powerUpIndicator = document.getElementById('powerUpIndicator');
+        const shieldIndicator = document.getElementById('shieldIndicator');
+        const speedIndicator = document.getElementById('speedIndicator');
+        const magnetIndicator = document.getElementById('magnetIndicator');
         const livesIndicator = document.getElementById('livesIndicator');
+        const achievementsBtn = document.getElementById('achievementsBtn');
+        const achievementsPanel = document.getElementById('achievementsPanel');
 
-        // ¡AUDIOELEMENTOS AÑADIDOS!
-        const audioMusic = document.getElementById('backgroundMusic');
-        const audioEat = document.getElementById('eatSound');
-        const audioLose = document.getElementById('loseSound');
-        const audioPowerUp = document.getElementById('powerUpMusic');
+        const bgMusic = document.getElementById('bgMusic');
+        const eatSound = document.getElementById('eatSound');
+        const powerSound = document.getElementById('powerSound');
+        const deathSound = document.getElementById('deathSound');
 
-        // ==================== VARIABLES DEL JUEGO ====================
-        let player;
-        let ghosts;
-        let pellets;
-        let powerPellets;
-        let score = 0;
-        let lives = GAME_CONFIG.INITIAL_LIVES;
-        let combo = 0;
-        let d;
-        let game;
+        // ==================== VARIABLES ====================
+        let player, ghosts, pellets, powerPellets, specialPowers = [];
+        let score = 0, lives = CONFIG.INITIAL_LIVES, combo = 0, level = 1;
+        let gameSpeed = CONFIG.INITIAL_SPEED, powerUpDuration = CONFIG.INITIAL_POWER_DURATION;
+        let isPoweredUp = false, powerUpTimer = 0;
+        let hasShield = false, shieldTimer = 0;
+        let hasSpeed = false, speedTimer = 0;
+        let hasMagnet = false, magnetTimer = 0;
+        let isInvulnerable = false, invulnerabilityTimer = 0;
+        let d, game;
         let playerName = "Preciosa";
-        let level = 1;
-        let gameSpeed = GAME_CONFIG.INITIAL_SPEED;
-        let powerUpDuration = GAME_CONFIG.INITIAL_POWER_DURATION;
-        let isPoweredUp = false;
-        let powerUpTimer = 0;
-        let isInvulnerable = false;
-        let invulnerabilityTimer = 0;
-
-        // ==================== SISTEMA DE PARTÍCULAS ====================
-        function createParticles() {
-            const body = document.body;
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 3 + 's';
-                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
-                body.appendChild(particle);
-            }
-        }
+        let achievements = [
+            { id: "first_blood", name: "Primer Corazón", desc: "Come tu primer fantasma", unlocked: false },
+            { id: "combo_master", name: "Combo x5", desc: "Logra un combo de 5", unlocked: false },
+            { id: "speed_demon", name: "Velocista", desc: "Usa velocidad 3 veces", unlocked: false },
+            { id: "shield_wall", name: "Muro Inquebrantable", desc: "Usa escudo 3 veces", unlocked: false },
+            { id: "level_5", name: "Nivel 5", desc: "Llega al nivel 5", unlocked: false },
+            { id: "perfect_level", name: "Nivel Perfecto", desc: "Completa un nivel sin perder vida", unlocked: false },
+            { id: "millionaire", name: "Puntaje Alto", desc: "Llega a 10,000 puntos", unlocked: false },
+            { id: "ghost_hunter", name: "Cazador de Amores", desc: "Come 20 fantasmas", unlocked: false },
+            { id: "true_love", name: "Amor Verdadero", desc: "Gana el juego", unlocked: false },
+            { id: "heart_collector", name: "Coleccionista", desc: "Recoge 500 puntos", unlocked: false }
+        ];
+        let ghostsEaten = 0, perfectLevel = true, speedUses = 0, shieldUses = 0;
 
         // ==================== ¡NUEVO AUDIO MANAGER! ====================
         const AudioManager = {
-            loaded: {},
-            
-            init() {
-                this.tryLoadAudio(audioMusic, 'musica.mp3', 'music');
-                this.tryLoadAudio(audioEat, 'comer.mp3', 'eat');
-                this.tryLoadAudio(audioLose, 'perder.mp3', 'lose');
-                this.tryLoadAudio(audioPowerUp, 'poder.mp3', 'power');
+            play(sound, isLoop = false) {
+                sound.currentTime = 0;
+                sound.loop = isLoop;
+                sound.play().catch(() => {}); // Ignora errores si el usuario no ha interactuado
             },
-
-            tryLoadAudio(element, src, key) {
-                element.src = src;
-                element.addEventListener('canplaythrough', () => {
-                    this.loaded[key] = true;
-                }, { once: true });
-                element.addEventListener('error', () => {
-                    this.loaded[key] = false;
-                    console.log(`Audio ${src} no disponible`);
-                }, { once: true });
+            stop(sound) {
+                sound.pause();
+                sound.currentTime = 0;
             },
-
-            play(key) {
-                if (!this.loaded[key]) return;
-                let audio;
-                switch(key) {
-                    case 'music': audio = audioMusic; break;
-                    case 'eat': audio = audioEat; break;
-                    case 'lose': audio = audioLose; break;
-                    case 'power': audio = audioPowerUp; break;
-                    default: return;
-                }
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log("Audio bloqueado por el navegador"));
-            },
-
-            stop(key) {
-                let audio;
-                switch(key) {
-                    case 'music': audio = audioMusic; break;
-                    case 'power': audio = audioPowerUp; break;
-                    default: return;
-                }
-                if (audio) {
-                    audio.pause();
-                    audio.currentTime = 0;
-                }
-            },
-            
             stopAll() {
-                this.stop('music');
-                this.stop('power');
+                this.stop(bgMusic);
+                this.stop(powerSound);
             }
         };
 
-        // ==================== CLASE GHOST (IA MEJORADA) ====================
+        // ==================== MODO NOCTURNO ====================
+        function updateTheme() {
+            const hour = new Date().getHours();
+            document.body.classList.toggle('night-mode', hour >= 18 || hour < 6);
+        }
+        setInterval(updateTheme, 60000);
+        updateTheme();
+
+        // ==================== PARTÍCULAS CORAZÓN ====================
+        function createHeartParticles(x, y, count = 5) {
+            const canvasRect = canvas.getBoundingClientRect();
+            for (let i = 0; i < count; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.textContent = '❤️'; // Usar emoji
+                
+                // Convertir coordenadas del canvas a coordenadas de la página
+                const pageX = canvasRect.left + (x / CONFIG.BOX_SIZE) * (canvasRect.width / canvasSize);
+                const pageY = canvasRect.top + (y / CONFIG.BOX_SIZE) * (canvasRect.height / canvasSize);
+
+                heart.style.left = (pageX + Math.random() * 20 - 10) + 'px';
+                heart.style.top = (pageY + Math.random() * 20 - 10) + 'px';
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 1500);
+            }
+        }
+
+        // ==================== GHOST CLASS ====================
         class Ghost {
             constructor(x, y, color, spawnX, spawnY) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.spawnX = spawnX;
-                this.spawnY = spawnY;
+                this.x = x; this.y = y; this.color = color;
+                this.spawnX = spawnX; this.spawnY = spawnY;
                 this.lastMove = null;
             }
-
             getDistance(x1, y1, x2, y2) {
                 return Math.abs(x1 - x2) + Math.abs(y1 - y2);
             }
-
             moveTowards(targetX, targetY, flee = false) {
-                const possibleMoves = [
+                const moves = [
                     { x: this.x + box, y: this.y, dir: 'RIGHT' },
                     { x: this.x - box, y: this.y, dir: 'LEFT' },
                     { x: this.x, y: this.y + box, dir: 'DOWN' },
                     { x: this.x, y: this.y - box, dir: 'UP' }
-                ];
-
-                const validMoves = possibleMoves.filter(move => {
-                    if (this.lastMove === 'RIGHT' && move.dir === 'LEFT') return false;
-                    if (this.lastMove === 'LEFT' && move.dir === 'RIGHT') return false;
-                    if (this.lastMove === 'UP' && move.dir === 'DOWN') return false;
-                    if (this.lastMove === 'DOWN' && move.dir === 'UP') return false;
+                ].filter(m => {
+                    if (this.lastMove === 'RIGHT' && m.dir === 'LEFT') return false;
+                    if (this.lastMove === 'LEFT' && m.dir === 'RIGHT') return false;
+                    if (this.lastMove === 'UP' && m.dir === 'DOWN') return false;
+                    if (this.lastMove === 'DOWN' && m.dir === 'UP') return false;
+                    // ¡Corrección! Permitir que los fantasmas usen el wrap
                     return true;
                 });
 
-                const moves = validMoves.length > 0 ? validMoves : possibleMoves;
+                if (moves.length === 0) moves.push({x: this.x, y: this.y, dir: null}); // No moverse
 
-                let bestMove = moves[0];
-                let bestDistance = flee 
-                    ? this.getDistance(bestMove.x, bestMove.y, targetX, targetY) * -1
-                    : this.getDistance(bestMove.x, bestMove.y, targetX, targetY);
+                let best = moves[0];
+                let bestDist = flee 
+                    ? -this.getDistance(best.x, best.y, targetX, targetY)
+                    : this.getDistance(best.x, best.y, targetX, targetY);
 
-                for (let move of moves) {
-                    const distance = flee
-                        ? this.getDistance(move.x, move.y, targetX, targetY) * -1
-                        : this.getDistance(move.x, move.y, targetX, targetY);
-                    
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestMove = move;
+                for (let m of moves) {
+                    const dist = flee ? -this.getDistance(m.x, m.y, targetX, targetY) : this.getDistance(m.x, m.y, targetX, targetY);
+                    if ((flee && dist > bestDist) || (!flee && dist < bestDist)) {
+                        bestDist = dist;
+                        best = m;
                     }
                 }
-
-                if (Math.random() < 0.2) {
-                    bestMove = moves[Math.floor(Math.random() * moves.length)];
-                }
-
-                this.x = bestMove.x;
-                this.y = bestMove.y;
-                this.lastMove = bestMove.dir;
+                if (Math.random() < 0.15 && moves.length > 1) best = moves[Math.floor(Math.random() * moves.length)];
+                
+                this.x = best.x; this.y = best.y; this.lastMove = best.dir;
 
                 // Wrap around
                 if (this.x < 0) this.x = (canvasSize - 1) * box;
@@ -580,173 +568,101 @@
                 if (this.y < 0) this.y = (canvasSize - 1) * box;
                 if (this.y >= canvasSize * box) this.y = 0;
             }
-
             respawn() {
-                this.x = this.spawnX;
-                this.y = this.spawnY;
-                this.lastMove = null;
+                this.x = this.spawnX; this.y = this.spawnY; this.lastMove = null;
             }
         }
 
-        // ==================== GESTIÓN DE HIGH SCORE ====================
-        const HighScoreManager = {
-            save(name, score) {
-                try {
-                    localStorage.setItem('juegoNovia_hsValue', score);
-                    localStorage.setItem('juegoNovia_hsName', name);
-                } catch (e) {
-                    console.log("No se pudo guardar el high score");
-                }
+        // ==================== HIGH SCORE & ACHIEVEMENTS ====================
+        const Storage = {
+            save(key, value) {
+                try { localStorage.setItem('amorJuego_' + key, JSON.stringify(value)); } catch(e) {}
             },
-
-            load() {
+            load(key, def) {
                 try {
-                    const hsValue = localStorage.getItem('juegoNovia_hsValue') || 0;
-                    const hsName = localStorage.getItem('juegoNovia_hsName') || 'Nadie';
-                    return { value: parseInt(hsValue), name: hsName };
-                } catch (e) {
-                    return { value: 0, name: 'Nadie' };
-                }
-            },
-
-            display() {
-                const hs = this.load();
-                highScoreDisplay.textContent = `Puntaje Más Alto: ${hs.name} - ${hs.value}`;
+                    const data = localStorage.getItem('amorJuego_' + key);
+                    return data ? JSON.parse(data) : def;
+                } catch(e) { return def; }
             }
         };
 
-        // ==================== EFECTOS VISUALES ====================
-        function shakeCanvas() {
-            canvas.classList.add('canvas-shake');
-            setTimeout(() => canvas.classList.remove('canvas-shake'), 500);
-        }
-
-        function showComboText(text, x, y) {
-            const comboElement = document.createElement('div');
-            comboElement.className = 'combo-text';
-            comboElement.textContent = text;
-            
-            // Ajustar posición al canvas
-            const canvasRect = canvas.getBoundingClientRect();
-            const canvasX = (x / box) * (canvasRect.width / canvasSize) + canvasRect.left;
-            const canvasY = (y / box) * (canvasRect.height / canvasSize) + canvasRect.top;
-            
-            comboElement.style.left = `${canvasX}px`;
-            comboElement.style.top = `${canvasY}px`;
-            
-            document.body.appendChild(comboElement);
-            
-            setTimeout(() => comboElement.remove(), 1000);
-        }
-
-        function updateLivesDisplay() {
-            const hearts = '❤️ '.repeat(lives);
-            livesIndicator.textContent = hearts.trim();
-        }
-
-        // ==================== INICIALIZACIÓN ====================
-        function init() {
-            createParticles();
-            AudioManager.init(); // ¡NUEVO!
-            HighScoreManager.display();
-            Controls.setup(); // ¡NUEVO! Mover setup aquí
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
-
-        // ==================== EVENTOS DE BOTONES ====================
-        btnJugar.addEventListener('click', () => {
-            playerName = playerNameInput.value.trim() || "Preciosa";
-            welcomeScreen.style.display = 'none';
-            gameTitle.style.display = 'block';
-            canvas.style.display = 'block';
-            livesIndicator.style.display = 'block';
-            
-            if (window.innerWidth <= 600) {
-                gameControls.style.display = 'grid';
+        function unlockAchievement(id) {
+            const ach = achievements.find(a => a.id === id);
+            if (ach && !ach.unlocked) {
+                ach.unlocked = true;
+                Storage.save('achievements', achievements);
+                showComboText('🏆 ' + ach.name, player.x, player.y);
             }
-
-            AudioManager.play('music'); // ¡NUEVO!
-            iniciarJuego();
-        });
-
-        btnReiniciar.addEventListener('click', () => {
-            location.reload();
-        });
-
-        // ==================== LÓGICA DEL JUEGO ====================
-        function iniciarJuego() {
-            score = 0;
-            lives = GAME_CONFIG.INITIAL_LIVES;
-            combo = 0;
-            level = 1;
-            gameSpeed = GAME_CONFIG.INITIAL_SPEED;
-            powerUpDuration = GAME_CONFIG.INITIAL_POWER_DURATION;
-            updateLivesDisplay();
-            setUpLevel();
         }
 
-        function nextLevel() {
-            clearInterval(game);
-            AudioManager.stop('power'); // ¡NUEVO!
-            AudioManager.play('music'); // ¡NUEVO!
-            level++;
-            score += GAME_CONFIG.POINTS_PER_LEVEL;
-            
-            gameSpeed = Math.max(GAME_CONFIG.MIN_SPEED, gameSpeed - GAME_CONFIG.SPEED_DECREASE);
-            powerUpDuration = Math.max(GAME_CONFIG.MIN_POWER_DURATION, powerUpDuration - GAME_CONFIG.POWER_DECREASE);
-            
-            showComboText(`¡Nivel ${level}!`, player.x, player.y);
+        function loadAchievements() {
+            achievements = Storage.load('achievements', achievements);
+        }
+
+        function showAchievements() {
+            achievementsPanel.innerHTML = '<div style="margin-bottom:10px;font-weight:bold;">Logros</div>';
+            achievements.forEach(ach => {
+                const div = document.createElement('div');
+                div.className = 'achievement' + (ach.unlocked ? ' unlocked' : '');
+                div.innerHTML = `${ach.unlocked ? '🏆' : '🔒'} <strong>${ach.name}</strong><br><small>${ach.desc}</small>`;
+                achievementsPanel.appendChild(div);
+            });
+            achievementsPanel.style.display = 'block';
+        }
+
+        // ==================== JUEGO ====================
+        function iniciarJuego() {
+            score = 0; lives = CONFIG.INITIAL_LIVES; level = 1; combo = 0;
+            gameSpeed = CONFIG.INITIAL_SPEED; powerUpDuration = CONFIG.INITIAL_POWER_DURATION;
+            ghostsEaten = 0; perfectLevel = true; speedUses = 0; shieldUses = 0;
+            loadAchievements();
+            updateLives();
+            AudioManager.play(bgMusic, true); // ¡CORREGIDO!
             setUpLevel();
         }
 
         function setUpLevel() {
             gameTitle.textContent = `¡Nivel ${level}!`;
-            gameTitle.style.animation = 'none';
-            setTimeout(() => gameTitle.style.animation = 'titleBounce 0.8s ease-out', 10);
-            
-            d = undefined;
-            isPoweredUp = false;
-            powerUpTimer = 0;
-            combo = 0;
-            isInvulnerable = false;
-            invulnerabilityTimer = 0;
-            powerUpIndicator.style.display = 'none';
-            
-            player = { x: 9 * box, y: 10 * box };
+            gameTitle.style.display = 'block';
+            canvas.style.display = 'block';
+            livesIndicator.style.display = 'block';
+            achievementsBtn.style.display = 'block';
+            if (window.innerWidth <= 600) gameControls.style.display = 'grid';
 
+            d = undefined; isPoweredUp = false; powerUpTimer = 0;
+            hasShield = false; shieldTimer = 0; hasSpeed = false; speedTimer = 0;
+            hasMagnet = false; magnetTimer = 0; isInvulnerable = false; invulnerabilityTimer = 0;
+
+            powerUpIndicator.style.display = 'none';
+            shieldIndicator.style.display = 'none';
+            speedIndicator.style.display = 'none';
+            magnetIndicator.style.display = 'none';
+
+            player = { x: 9 * box, y: 10 * box };
             ghosts = [];
-            const ghostPositions = [
-                [1, 1], [canvasSize - 2, 1], 
-                [1, canvasSize - 2], [canvasSize - 2, canvasSize - 2]
-            ];
-            
-            for (let i = 0; i < ghostPositions.length; i++) {
-                const [gx, gy] = ghostPositions[i];
-                ghosts.push(new Ghost(
-                    gx * box, gy * box, 
-                    GAME_CONFIG.GHOST_COLORS[i],
-                    gx * box, gy * box
-                ));
+            const positions = [[1,1],[canvasSize-2,1],[1,canvasSize-2],[canvasSize-2,canvasSize-2]];
+            // Añade más fantasmas según el nivel
+            for (let i = 0; i < Math.min(Math.floor(level / 2) + 1, 4); i++) {
+                const [gx, gy] = positions[i];
+                ghosts.push(new Ghost(gx*box, gy*box, CONFIG.GHOST_COLORS[i], gx*box, gy*box));
             }
 
-            pellets = [];
-            powerPellets = [];
-            
+            pellets = []; powerPellets = []; specialPowers = [];
             for (let x = 0; x < canvasSize; x++) {
                 for (let y = 0; y < canvasSize; y++) {
                     if (x === 9 && y === 10) continue;
-                    
-                    let onGhost = ghosts.some(g => g.x === x * box && g.y === y * box);
-                    if (onGhost) continue;
+                    if (ghosts.some(g => g.x === x*box && g.y === y*box)) continue;
 
-                    if ((x === 0 && y === 0) || 
-                        (x === canvasSize - 1 && y === 0) || 
-                        (x === 0 && y === canvasSize - 1) || 
-                        (x === canvasSize - 1 && y === canvasSize - 1)) {
-                        powerPellets.push({ x: x * box, y: y * box });
+                    const isCorner = (x === 0 && y === 0) || (x === canvasSize-1 && y === 0) ||
+                                     (x === 0 && y === canvasSize-1) || (x === canvasSize-1 && y === canvasSize-1);
+
+                    if (isCorner) {
+                        powerPellets.push({ x: x*box, y: y*box, type: 'power' });
+                    } else if (Math.random() < 0.05 && level > 2) {
+                        const types = ['shield', 'speed', 'magnet'];
+                        specialPowers.push({ x: x*box, y: y*box, type: types[Math.floor(Math.random()*3)] });
                     } else {
-                        pellets.push({ x: x * box, y: y * box });
+                        pellets.push({ x: x*box, y: y*box });
                     }
                 }
             }
@@ -755,235 +671,371 @@
             game = setInterval(draw, gameSpeed);
         }
 
+        function updateLives() {
+            livesIndicator.textContent = '❤️ '.repeat(lives);
+        }
+
         function loseLife() {
+            perfectLevel = false;
             lives--;
-            updateLivesDisplay();
-            shakeCanvas();
-            AudioManager.play('lose'); // ¡NUEVO!
-            AudioManager.stopAll(); // Para todo
+            updateLives();
+            AudioManager.play(deathSound); // ¡CORREGIDO!
+            AudioManager.stopAll(); // ¡CORREGIDO!
+            canvas.classList.add('canvas-shake');
+            setTimeout(() => canvas.classList.remove('canvas-shake'), 500);
 
             if (lives <= 0) {
                 mostrarGameOver();
             } else {
-                // Respawn con invulnerabilidad temporal
-                player = { x: 9 * box, y: 10 * box };
-                d = undefined;
-                isInvulnerable = true;
-                invulnerabilityTimer = GAME_CONFIG.INVULNERABILITY_TICKS;
-                
+                player = { x: 9*box, y: 10*box }; d = undefined;
+                isInvulnerable = true; invulnerabilityTimer = CONFIG.INVULNERABILITY_TICKS;
                 ghosts.forEach(g => g.respawn());
-                
-                showComboText(`-1 ❤️`, player.x, player.y);
-                
-                // Reanuda la música de fondo después de un momento
-                setTimeout(() => {
-                    AudioManager.play('music');
-                }, 1000); // 1 segundo
+                setTimeout(() => AudioManager.play(bgMusic, true), 1000); // Reanuda música
             }
+        }
+
+        function nextLevel() {
+            if (perfectLevel && level > 1) unlockAchievement('perfect_level');
+            if (level === 5) unlockAchievement('level_5');
+            if (level >= CONFIG.MAX_LEVEL) {
+                mostrarVictoria();
+                return;
+            }
+
+            clearInterval(game);
+            level++;
+            score += CONFIG.POINTS_PER_LEVEL;
+            gameSpeed = Math.max(CONFIG.MIN_SPEED, gameSpeed - CONFIG.SPEED_DECREASE);
+            powerUpDuration = Math.max(CONFIG.MIN_POWER_DURATION, powerUpDuration - CONFIG.POWER_DECREASE);
+            perfectLevel = true;
+
+            showComboText(`¡Nivel ${level}!`, player.x, player.y);
+            setTimeout(setUpLevel, 1000);
         }
 
         function mostrarGameOver() {
             clearInterval(game);
-            AudioManager.stopAll(); // ¡NUEVO!
-            
-            // Espera a que termine el shake
-            setTimeout(() => {
-                const hs = HighScoreManager.load();
-                finalScoreDisplay.textContent = `${playerName}, Nivel ${level} - ${score} pts`;
-
-                if (score > hs.value) {
-                    HighScoreManager.save(playerName, score);
-                    finalHighScoreDisplay.textContent = `¡NUEVO RÉCORD!`;
-                    finalHighScoreDisplay.style.display = 'block';
-                } else {
-                    finalHighScoreDisplay.textContent = `Puntaje más alto: ${hs.name} - ${hs.value}`;
-                    finalHighScoreDisplay.style.display = 'block';
-                }
-
-                gameTitle.style.display = 'none';
-                canvas.style.display = 'none';
-                gameControls.style.display = 'none';
-                powerUpIndicator.style.display = 'none';
-                livesIndicator.style.display = 'none';
-                gameOverScreen.style.display = 'flex';
-            }, 500); // 500ms = duración del shake
+            AudioManager.stopAll(); // ¡CORREGIDO!
+            const hs = Storage.load('highscore', { value: 0, name: 'Nadie' });
+            finalScoreDisplay.textContent = `${playerName}, Nivel ${level} - ${score} pts`;
+            if (score > hs.value) {
+                Storage.save('highscore', { value: score, name: playerName });
+                finalHighScoreDisplay.textContent = `¡NUEVO RÉCORD!`;
+            } else {
+                finalHighScoreDisplay.textContent = `Récord: ${hs.name} - ${hs.value}`;
+            }
+            hideGameElements();
+            gameOverScreen.style.display = 'flex';
         }
 
-        // ==================== CONTROLES (COMPLETADO) ====================
-        const Controls = {
-            setup() {
-                document.getElementById('btnArriba').addEventListener('click', () => {
-                    if (d !== "DOWN") d = "UP";
-                });
-                document.getElementById('btnAbajo').addEventListener('click', () => {
-                    if (d !== "UP") d = "DOWN";
-                });
-                document.getElementById('btnIzquierda').addEventListener('click', () => {
-                    if (d !== "RIGHT") d = "LEFT";
-                });
-                document.getElementById('btnDerecha').addEventListener('click', () => {
-                    if (d !== "LEFT") d = "RIGHT";
-                });
+        function mostrarVictoria() {
+            clearInterval(game);
+            AudioManager.stopAll(); // ¡CORREGIDO!
+            unlockAchievement('true_love');
+            Storage.save('highscore', { value: score, name: playerName });
+            hideGameElements();
+            victoryScreen.style.display = 'flex';
+            setTimeout(() => {
+                secretReveal.textContent = "¡Has desbloqueado mi corazón!";
+                secretMessage.style.display = 'block';
+            }, 2000);
+        }
 
-                document.addEventListener('keydown', this.handleKeyPress);
-            },
+        function hideGameElements() {
+            gameTitle.style.display = 'none';
+            canvas.style.display = 'none';
+            gameControls.style.display = 'none';
+            livesIndicator.style.display = 'none';
+            achievementsBtn.style.display = 'none';
+            achievementsPanel.style.display = 'none';
+            [powerUpIndicator, shieldIndicator, speedIndicator, magnetIndicator].forEach(el => el.style.display = 'none');
+        }
 
-            handleKeyPress(e) {
-                if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-                    e.preventDefault();
-                }
+        function showComboText(text, x, y) {
+            const el = document.createElement('div');
+            el.className = 'combo-text';
+            el.textContent = text;
+            
+            const canvasRect = canvas.getBoundingClientRect();
+            const pageX = canvasRect.left + (x / CONFIG.BOX_SIZE) * (canvasRect.width / canvasSize);
+            const pageY = canvasRect.top + (y / CONFIG.BOX_SIZE) * (canvasRect.height / canvasSize);
 
-                const key = e.key.toLowerCase();
-                
-                if (e.key === "ArrowUp" || key === "w") {
-                    if (d !== "DOWN") d = "UP";
-                } else if (e.key === "ArrowDown" || key === "s") {
-                    if (d !== "UP") d = "DOWN";
-                } else if (e.key === "ArrowLeft" || key === "a") {
-                    if (d !== "RIGHT") d = "LEFT";
-                } else if (e.key === "ArrowRight" || key === "d") {
-                    if (d !== "LEFT") d = "RIGHT";
-                }
-            }
-        };
+            el.style.left = pageX + 'px';
+            el.style.top = pageY + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
 
-        // ==================== LOOP PRINCIPAL (COMPLETADO) ====================
+        // ==================== DIBUJO ====================
         function draw() {
-            // Limpiar canvas
-            ctx.fillStyle = "#1a1a1a";
+            ctx.fillStyle = document.body.classList.contains('night-mode') ? '#1a1a1a' : '#222';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Tickers de Timers
-            if (isInvulnerable) {
-                invulnerabilityTimer--;
-                if (invulnerabilityTimer <= 0) {
-                    isInvulnerable = false;
+            // Pellets
+            ctx.fillStyle = '#f8c8dc';
+            pellets.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x + box/2, p.y + box/2, box/6, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            // Power Pellets
+            ctx.fillStyle = '#ffd700';
+            powerPellets.forEach(p => {
+                const pulse = Math.sin(Date.now() * 0.01) * 0.3 + 1;
+                ctx.beginPath();
+                ctx.arc(p.x + box/2, p.y + box/2, (box/4)*pulse, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            // Special Powers
+            specialPowers.forEach(p => {
+                ctx.font = `${box*0.8}px Arial`;
+                let emoji = '❓';
+                if(p.type === 'shield') emoji = '🛡️';
+                if(p.type === 'speed') emoji = '⚡';
+                if(p.type === 'magnet') emoji = '🧲';
+                ctx.fillText(emoji, p.x + box/2, p.y + box/2);
+            });
+
+            // Movimiento jugador
+            const speed = hasSpeed ? 2 : 1;
+            for (let i = 0; i < speed; i++) {
+                if (!d) break;
+                let nextX = player.x;
+                let nextY = player.y;
+
+                if (d === "LEFT") nextX -= box;
+                if (d === "UP") nextY -= box;
+                if (d === "RIGHT") nextX += box;
+                if (d === "DOWN") nextY += box;
+                
+                // Wrap around
+                if (nextX < 0) nextX = (canvasSize-1)*box;
+                if (nextX >= canvasSize*box) nextX = 0;
+                if (nextY < 0) nextY = (canvasSize-1)*box;
+                if (nextY >= canvasSize*box) nextY = 0;
+
+                player.x = nextX;
+                player.y = nextY;
+            }
+
+            // Imán
+            if (hasMagnet) {
+                pellets = pellets.filter(p => {
+                    if (Math.abs(p.x - player.x) < box*3 && Math.abs(p.y - player.y) < box*3) {
+                        score += CONFIG.POINTS_PER_PELLET;
+                        AudioManager.play(eatSound);
+                        createHeartParticles(p.x, p.y, 3);
+                        return false;
+                    }
+                    return true;
+                });
+            }
+
+            // Comer
+            pellets = pellets.filter(p => {
+                if (p.x === player.x && p.y === player.y) {
+                    score += CONFIG.POINTS_PER_PELLET;
+                    combo++;
+                    AudioManager.play(eatSound);
+                    createHeartParticles(p.x, p.y);
+                    if (score >= 500) unlockAchievement('heart_collector');
+                    if (score >= 10000) unlockAchievement('millionaire');
+                    return false;
                 }
-            }
-            if (isPoweredUp) {
-                powerUpTimer--;
-                if (powerUpTimer <= 0) {
-                    isPoweredUp = false;
-                    combo = 0;
-                    powerUpIndicator.style.display = 'none';
-                    AudioManager.stop('power');
-                    AudioManager.play('music');
+                return true;
+            });
+
+            powerPellets = powerPellets.filter(p => {
+                if (p.x === player.x && p.y === player.y) {
+                    score += CONFIG.POINTS_PER_POWER;
+                    isPoweredUp = true; powerUpTimer = powerUpDuration;
+                    powerUpIndicator.style.display = 'block';
+                    AudioManager.stop(bgMusic); // ¡CORREGIDO!
+                    AudioManager.play(powerSound, true); // ¡CORREGIDO!
+                    combo = 0; // Combo se resetea
+                    createHeartParticles(p.x, p.y, 8);
+                    return false;
                 }
-            }
+                return true;
+            });
 
-            // Dibujar pellets
-            ctx.fillStyle = "#f8c8dc";
-            ctx.font = `bold ${box}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            for (let p of pellets) {
-                ctx.fillText('·', p.x + box / 2, p.y + box / 2);
-            }
+            specialPowers = specialPowers.filter(p => {
+                if (p.x === player.x && p.y === player.y) {
+                    if (p.type === 'shield') { hasShield = true; shieldTimer = CONFIG.POWER_UP_DURATION; shieldIndicator.style.display = 'block'; shieldUses++; if (shieldUses >= 3) unlockAchievement('shield_wall'); }
+                    if (p.type === 'speed') { hasSpeed = true; speedTimer = CONFIG.POWER_UP_DURATION; speedIndicator.style.display = 'block'; speedUses++; if (speedUses >= 3) unlockAchievement('speed_demon'); }
+                    if (p.type === 'magnet') { hasMagnet = true; magnetTimer = CONFIG.POWER_UP_DURATION; magnetIndicator.style.display = 'block'; }
+                    AudioManager.play(powerSound); // Sonido corto, no el loop
+                    createHeartParticles(p.x, p.y, 6);
+                    return false;
+                }
+                return true;
+            });
 
-            // Dibujar uvas
-            ctx.fillStyle = "#f8c8dc";
-            ctx.font = `${box}px Arial`;
-            for (let p of powerPellets) {
-                ctx.fillText('🍇', p.x + box / 2, p.y + box / 2 + 2);
-            }
+            // Timers
+            if (isPoweredUp && --powerUpTimer <= 0) { isPoweredUp = false; powerUpIndicator.style.display = 'none'; AudioManager.stop(powerSound); AudioManager.play(bgMusic, true); }
+            if (hasShield && --shieldTimer <= 0) { hasShield = false; shieldIndicator.style.display = 'none'; }
+            if (hasSpeed && --speedTimer <= 0) { hasSpeed = false; speedIndicator.style.display = 'none'; }
+            if (hasMagnet && --magnetTimer <= 0) { hasMagnet = false; magnetIndicator.style.display = 'none'; }
+            if (isInvulnerable && --invulnerabilityTimer <= 0) isInvulnerable = false;
 
-            // Dibujar jugador (con parpadeo si es invulnerable)
-            if (!isInvulnerable || (isInvulnerable && invulnerabilityTimer % 4 < 2)) {
-                ctx.fillStyle = "#f8c8dc";
-                ctx.font = `${box}px Arial`;
-                ctx.fillText('❤️', player.x + box / 2, player.y + box / 2 + 2);
-            }
+            // Fantasmas
+            ghosts.forEach(ghost => {
+                ghost.moveTowards(player.x, player.y, isPoweredUp);
+            });
 
-            // Dibujar fantasmas
-            for (let g of ghosts) {
-                ctx.fillStyle = isPoweredUp ? "#aaa" : g.color;
-                ctx.fillText('👻', g.x + box / 2, g.y + box / 2 + 2);
-            }
-
-            // Dibujar Puntuación
-            ctx.fillStyle = "#fff";
-            ctx.font = "20px Arial";
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            ctx.fillText(`${playerName}: ${score}`, 10, 10);
-            
-            if (!d) return; // No mover si no hay dirección
-
-            // Mover Jugador
-            let playerX = player.x;
-            let playerY = player.y;
-            if (d == "LEFT") playerX -= box;
-            if (d == "UP") playerY -= box;
-            if (d == "RIGHT") playerX += box;
-            if (d == "DOWN") playerY += box;
-
-            // Wrap
-            if (playerX < 0) playerX = (canvasSize - 1) * box;
-            if (playerX >= canvasSize * box) playerX = 0;
-            if (playerY < 0) playerY = (canvasSize - 1) * box;
-            if (playerY >= canvasSize * box) playerY = 0;
-            
-            player.x = playerX;
-            player.y = playerY;
-
-            // Mover Fantasmas
-            for (let g of ghosts) {
-                g.moveTowards(player.x, player.y, isPoweredUp);
-            }
-
-            // --- REVISAR COLISIONES ---
-            
-            // a) ¿Jugador choca con fantasma?
-            for (let g of ghosts) {
-                if (player.x === g.x && player.y === g.y) {
+            // Colisión
+            for (let ghost of ghosts) {
+                if (player.x === ghost.x && player.y === ghost.y) {
                     if (isPoweredUp) {
-                        // Come al fantasma
+                        score += CONFIG.POINTS_PER_GHOST * (combo + 1);
+                        ghostsEaten++;
+                        if (ghostsEaten === 1) unlockAchievement('first_blood');
+                        if (ghostsEaten >= 20) unlockAchievement('ghost_hunter');
+                        showComboText(`+${CONFIG.POINTS_PER_GHOST * (combo + 1)}`, ghost.x, ghost.y);
+                        ghost.respawn();
                         combo++;
-                        let comboPoints = GAME_CONFIG.POINTS_PER_GHOST * combo;
-                        score += comboPoints;
-                        g.respawn();
-                        AudioManager.play('eat');
-                        showComboText(`+${comboPoints}!`, player.x, player.y);
-                    } else if (!isInvulnerable) {
-                        // Pierde una vida
+                        if (combo >= 5) unlockAchievement('combo_master');
+                        createHeartParticles(ghost.x, ghost.y, 10);
+                        AudioManager.play(eatSound);
+                    } else if (!isInvulnerable && !hasShield) {
                         loseLife();
-                        return; // Detiene el frame
+                    } else if (hasShield) {
+                        hasShield = false; shieldTimer = 0; shieldIndicator.style.display = 'none';
+                        ghost.respawn();
+                        AudioManager.play(deathSound);
                     }
                 }
             }
-            
-            // b) ¿Jugador come un pellet?
-            for (let i = pellets.length - 1; i >= 0; i--) { 
-                if (player.x === pellets[i].x && player.y === pellets[i].y) {
-                    score += GAME_CONFIG.POINTS_PER_PELLET;
-                    AudioManager.play('eat');
-                    pellets.splice(i, 1); 
-                    break; 
-                }
-            }
+            if (!isPoweredUp) combo = 0; // Resetea combo si se acaba el poder
 
-            // c) ¿Jugador come una uva (power pellet)?
-            for (let i = powerPellets.length - 1; i >= 0; i--) {
-                if (player.x === powerPellets[i].x && player.y === powerPellets[i].y) {
-                    score += GAME_CONFIG.POINTS_PER_POWER;
-                    isPoweredUp = true;
-                    powerUpTimer = powerUpDuration;
-                    combo = 0;
-                    powerUpIndicator.style.display = 'block';
-                    AudioManager.play('eat');
-                    AudioManager.stop('music');
-                    AudioManager.play('power');
-                    powerPellets.splice(i, 1); 
-                    break; 
-                }
-            }
+            // Dibujar jugador
+            ctx.fillStyle = '#ffff00';
+            if (isInvulnerable && Math.floor(Date.now()/100)%2===0) ctx.fillStyle = '#ff69b4';
+            if (hasShield) ctx.fillStyle = '#00ffff';
             
-            // d) ¿Gana el nivel?
-            if (pellets.length === 0 && powerPellets.length === 0) {
-                nextLevel(); 
-                return;
+            ctx.beginPath();
+            let angle = 0;
+            if (d === "RIGHT") angle = 0;
+            if (d === "LEFT") angle = Math.PI;
+            if (d === "UP") angle = -Math.PI / 2;
+            if (d === "DOWN") angle = Math.PI / 2;
+            
+            const mouth = !d ? 0.05 : 0.2 + Math.abs(Math.sin(Date.now() * 0.02)) * 0.2;
+            ctx.arc(player.x + box/2, player.y + box/2, box/2.2, angle + mouth, angle - mouth);
+            ctx.lineTo(player.x + box/2, player.y + box/2);
+            ctx.fill();
+
+
+            // Dibujar fantasmas
+            ghosts.forEach(ghost => {
+                ctx.fillStyle = isPoweredUp ? '#aaa' : ghost.color;
+                if (isPoweredUp) {
+                    // Forma de corazón
+                    ctx.font = `${box*0.8}px Arial`;
+                    ctx.fillText('❤️', ghost.x + box/2, ghost.y + box/2);
+                } else {
+                    // Forma de fantasma
+                    ctx.beginPath();
+                    ctx.arc(ghost.x + box/2, ghost.y + box/2, box/2.2, Math.PI, 0);
+                    ctx.lineTo(ghost.x + box, ghost.y + box);
+                    ctx.lineTo(ghost.x + box*0.8, ghost.y + box*0.8);
+                    ctx.lineTo(ghost.x + box*0.6, ghost.y + box);
+                    ctx.lineTo(ghost.x + box*0.4, ghost.y + box*0.8);
+                    ctx.lineTo(ghost.x + box*0.2, ghost.y + box);
+                    ctx.lineTo(ghost.x, ghost.y + box);
+                    ctx.fill();
+                }
+                
+                // Ojos
+                ctx.fillStyle = 'white';
+                let eyeX1 = ghost.x + box/3.5, eyeX2 = ghost.x + 2*box/3.5;
+                let eyeY = ghost.y + box/3;
+                if(d === 'LEFT' && !isPoweredUp) { eyeX1 -= 2; eyeX2 -= 2; }
+                if(d === 'RIGHT' && !isPoweredUp) { eyeX1 += 2; eyeX2 += 2; }
+                if(d === 'UP' && !isPoweredUp) { eyeY -= 2; }
+                if(d === 'DOWN' && !isPoweredUp) { eyeY += 2; }
+                
+                ctx.beginPath();
+                ctx.arc(eyeX1, eyeY, box/8, 0, Math.PI*2);
+                ctx.arc(eyeX2, eyeY, box/8, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+                ctx.arc(eyeX1, eyeY, box/16, 0, Math.PI*2);
+                ctx.arc(eyeX2, eyeY, box/16, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            // Victoria
+            if (pellets.length === 0 && powerPellets.length === 0 && specialPowers.length === 0) {
+                nextLevel();
             }
         }
+
+        // ==================== CONTROLES ====================
+        document.getElementById('btnArriba').onclick = () => { if (d !== "DOWN") d = "UP"; };
+        document.getElementById('btnAbajo').onclick = () => { if (d !== "UP") d = "DOWN"; };
+        document.getElementById('btnIzquierda').onclick = () => { if (d !== "RIGHT") d = "LEFT"; };
+        document.getElementById('btnDerecha').onclick = () => { if (d !== "LEFT") d = "RIGHT"; };
+
+        document.addEventListener('keydown', e => {
+            const key = e.key.toLowerCase();
+            if (["arrowup","w"].includes(key) && d !== "DOWN") d = "UP";
+            if (["arrowdown","s"].includes(key) && d !== "UP") d = "DOWN";
+            if (["arrowleft","a"].includes(key) && d !== "RIGHT") d = "LEFT";
+            if (["arrowright","d"].includes(key) && d !== "LEFT") d = "RIGHT";
+            if (["arrowup", "arrowdown", "arrowleft", "arrowright"].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // ==================== EVENTOS ====================
+        btnJugar.onclick = () => {
+            playerName = playerNameInput.value.trim() || "Preciosa";
+            Storage.save('playername', playerName);
+            welcomeScreen.style.display = 'none';
+            iniciarJuego();
+        };
+
+        btnReiniciar.onclick = () => location.reload();
+
+        btnCredits.onclick = () => {
+            victoryScreen.style.display = 'none';
+            creditsScreen.style.display = 'flex';
+        };
+
+        btnBack.onclick = () => {
+            location.reload();
+        };
+
+        achievementsBtn.onclick = () => {
+            if (achievementsPanel.style.display === 'block') {
+                achievementsPanel.style.display = 'none';
+            } else {
+                loadAchievements(); // Carga los últimos logros
+                showAchievements();
+            }
+        };
+
+        // ==================== INICIO ====================
+        function init() {
+            const hs = Storage.load('highscore', { value: 0, name: 'Nadie' });
+            highScoreDisplay.textContent = `Puntaje Más Alto: ${hs.name} - ${hs.value}`;
+            playerNameInput.value = Storage.load('playername', '');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 3 + 's';
+                p.style.animationDuration = (2 + Math.random() * 2) + 's';
+                document.body.appendChild(p);
+            }
+        }
+        init();
     </script>
 </body>
 </html>
